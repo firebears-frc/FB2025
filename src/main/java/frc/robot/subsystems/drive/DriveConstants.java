@@ -21,10 +21,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = 4.8;
+  public static final double maxSpeedMetersPerSec = 5.5;
   public static final double odometryFrequency = 100.0; // Hz
-  public static final double trackWidth = Units.inchesToMeters(26.5);
-  public static final double wheelBase = Units.inchesToMeters(26.5);
+  public static final double moduleOffset = Units.inchesToMeters(1.75);
+  public static final double trackWidth = Units.inchesToMeters(22) - (moduleOffset * 2);
+  public static final double wheelBase = Units.inchesToMeters(28) - (moduleOffset * 2);
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
@@ -35,22 +36,22 @@ public class DriveConstants {
       };
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
+  public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(-90.0);
+  public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(0.0);
+  public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(180.0);
+  public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(90.0);
 
   // Device CAN IDs
   public static final int pigeonCanId = 9;
 
   public static final int frontLeftDriveCanId = 1;
-  public static final int backLeftDriveCanId = 3;
-  public static final int frontRightDriveCanId = 5;
+  public static final int backLeftDriveCanId = 5;
+  public static final int frontRightDriveCanId = 3;
   public static final int backRightDriveCanId = 7;
 
   public static final int frontLeftTurnCanId = 2;
-  public static final int backLeftTurnCanId = 4;
-  public static final int frontRightTurnCanId = 6;
+  public static final int backLeftTurnCanId = 6;
+  public static final int frontRightTurnCanId = 4;
   public static final int backRightTurnCanId = 8;
 
   // Drive motor configuration
@@ -67,10 +68,11 @@ public class DriveConstants {
       (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.0;
+  public static final double driveKp = 0.25;
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.0;
-  public static final double driveKv = 0.1;
+  public static final double driveKv =
+      driveMotorReduction / ((6784.0 / 60) * (wheelRadiusMeters * 2 * Math.PI));
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.0;
@@ -88,7 +90,7 @@ public class DriveConstants {
   public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 2.0;
+  public static final double turnKp = 3.5;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;
