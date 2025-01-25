@@ -13,21 +13,23 @@
 
 package frc.robot.subsystems.drive;
 
-//import static frc.robot.subsystems.drive.DriveConstants.*;
+// import static frc.robot.subsystems.drive.DriveConstants.*;
+
+import static frc.robot.subsystems.drive.DriveConstants.gyroCanId;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
-//import com.studica.frc.AHRS;
-//import com.studica.frc.AHRS.NavXComType;
+// import com.studica.frc.AHRS;
+// import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.Queue;
 
 /** IO implementation for NavX. */
 public class GyroIOCanandgyro implements GyroIO {
-  //private final AHRS navX = new AHRS(NavXComType.kMXP_SPI, (byte) odometryFrequency);
+  // private final AHRS navX = new AHRS(NavXComType.kMXP_SPI, (byte) odometryFrequency);
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
-  private final Canandgyro canandgyro = new Canandgyro(9);
+  private final Canandgyro canandgyro = new Canandgyro(gyroCanId);
 
   public GyroIOCanandgyro() {
     yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
@@ -38,7 +40,7 @@ public class GyroIOCanandgyro implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = canandgyro.isConnected();
     inputs.yawPosition = canandgyro.getRotation2d();
-    inputs.yawVelocityRadPerSec = Units.degreesToRadians(2*canandgyro.getYaw());
+    inputs.yawVelocityRadPerSec = Units.degreesToRadians(2 * canandgyro.getYaw());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
