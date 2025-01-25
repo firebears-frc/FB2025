@@ -42,7 +42,7 @@ public class DriveConstants {
   public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(90.0);
 
   // Device CAN IDs
-  public static final int pigeonCanId = 9;
+  public static final int gyroCanId = 9;
 
   public static final int frontLeftDriveCanId = 1;
   public static final int backLeftDriveCanId = 5;
