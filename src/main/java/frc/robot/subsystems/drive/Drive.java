@@ -70,6 +70,7 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+  private final Rotation2d gyroOffset = Rotation2d.fromDegrees(180.0);
 
   public Drive(
       GyroIO gyroIO,
@@ -167,7 +168,7 @@ public class Drive extends SubsystemBase {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        rawGyroRotation = gyroInputs.odometryYawPositions[i].plus(gyroOffset);
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
