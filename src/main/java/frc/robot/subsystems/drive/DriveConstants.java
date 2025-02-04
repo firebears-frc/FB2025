@@ -35,21 +35,23 @@ public class DriveConstants {
       };
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
+  public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(-90.0);
+  public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(0.0);
+  public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(180.0);
+  public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(90.0);
 
   // Device CAN IDs
   public static final int gyroCanId = 9;
 
   public static final int frontLeftDriveCanId = 1;
   public static final int backLeftDriveCanId = 5;
+
   public static final int frontRightDriveCanId = 3;
   public static final int backRightDriveCanId = 7;
 
   public static final int frontLeftTurnCanId = 2;
   public static final int backLeftTurnCanId = 6;
+
   public static final int frontRightTurnCanId = 4;
   public static final int backRightTurnCanId = 8;
 
