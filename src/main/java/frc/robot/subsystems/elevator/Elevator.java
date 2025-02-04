@@ -61,7 +61,7 @@ public class Elevator extends SubsystemBase {
                 PersistMode.kPersistParameters));
   }
 
-  public void setShoulderSetpoint(Rotation2d setpoint) { // change values later
+  public void elevatorSetpoint(Rotation2d setpoint) { // change values later
     if (setpoint.getDegrees() < -5) {
       setpoint = Rotation2d.fromDegrees(-5);
     } else if (setpoint.getDegrees() > 100) {
