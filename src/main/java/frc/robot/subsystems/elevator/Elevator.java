@@ -29,7 +29,6 @@ public class Elevator extends SubsystemBase {
   private RelativeEncoder elevatorEncoder = leftElevatorMotor.getEncoder();
 
   private final SparkMax rightElevatorMotor = new SparkMax(11, MotorType.kBrushless);
-  private SparkClosedLoopController rightClosedLoopController;
 
   private Debouncer debounce = new Debouncer(0.2);
 
@@ -57,8 +56,6 @@ public class Elevator extends SubsystemBase {
                 PersistMode.kPersistParameters));
 
     var rightSparkMaxConfig = new SparkMaxConfig();
-    rightClosedLoopController = rightElevatorMotor.getClosedLoopController();
-
     rightSparkMaxConfig.follow(10, true);
 
     tryUntilOk(
