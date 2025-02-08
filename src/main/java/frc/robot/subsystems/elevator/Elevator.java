@@ -2,8 +2,6 @@ package frc.robot.subsystems.elevator;
 
 import static frc.robot.util.SparkUtil.*;
 
-import java.util.function.Supplier;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -20,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,9 +26,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMax leftElevatorMotor = new SparkMax(10, MotorType.kBrushless);
   private SparkClosedLoopController leftClosedLoopController;
   private RelativeEncoder elevatorEncoder = leftElevatorMotor.getEncoder();
-
   private final SparkMax rightElevatorMotor = new SparkMax(11, MotorType.kBrushless);
-
   private Debouncer debounce = new Debouncer(0.2);
 
   @AutoLogOutput(key = "elevator/setPoint")
@@ -44,7 +41,7 @@ public class Elevator extends SubsystemBase {
         .smartCurrentLimit(40, 40)
         .secondaryCurrentLimit(50);
 
-    leftSparkMaxConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0, 0, 0);
+    leftSparkMaxConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0.05, 0, 0);
 
     tryUntilOk(
         leftElevatorMotor,
@@ -66,17 +63,18 @@ public class Elevator extends SubsystemBase {
                 rightSparkMaxConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
+    setElevatorSetpoint(getElevatorRotations());
   }
 
   private static final class constants { // arm setpoints
     private static final Rotation2d zero = Rotation2d.fromRotations(0.0);
     private static final Rotation2d pickUp = Rotation2d.fromRotations(0.0);
-    private static final Rotation2d levelOne = Rotation2d.fromRotations(0.0);
-    private static final Rotation2d levelTwo = Rotation2d.fromRotations(0.0);
-    private static final Rotation2d levelThree = Rotation2d.fromRotations(0.0);
-    private static final Rotation2d levelFour = Rotation2d.fromRotations(0.0);
+    private static final Rotation2d levelOne = Rotation2d.fromRotations(10.0);
+    private static final Rotation2d levelTwo = Rotation2d.fromRotations(20.0);
+    private static final Rotation2d levelThree = Rotation2d.fromRotations(30.0);
+    private static final Rotation2d levelFour = Rotation2d.fromRotations(40.0);
 
-    private static final double elevetorG = 0.0;
+    private static final double elevetorG = 0.02;
   }
 
   public void setElevatorSetpoint(Rotation2d setpoint) {
@@ -115,10 +113,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command defaultCommand(Supplier<Double> elevatorChange) {
-        return run(() -> {
-           setElevatorSetpoint(elevatorSetpoint.minus(Rotation2d.fromRotations(elevatorChange.get())));
+    return run(
+        () -> {
+          setElevatorSetpoint(
+              elevatorSetpoint.minus(Rotation2d.fromRotations(elevatorChange.get())));
         });
-    }
+  }
 
   public Command pickUp() {
     return positionCommand(constants.pickUp, 1);
