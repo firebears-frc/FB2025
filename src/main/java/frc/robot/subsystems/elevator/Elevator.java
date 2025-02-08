@@ -2,6 +2,8 @@ package frc.robot.subsystems.elevator;
 
 import static frc.robot.util.SparkUtil.*;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -114,6 +116,12 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("elevator/at debouncespeed", debounced);
     return debounced;
   }
+
+  public Command defaultCommand(Supplier<Double> elevatorChange) {
+        return run(() -> {
+           setElevatorSetpoint(elevatorSetpoint.minus(Rotation2d.fromRotations(elevatorChange.get())));
+        });
+    }
 
   public Command pickUp() {
     return positionCommand(constants.pickUp, 1);
