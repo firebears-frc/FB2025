@@ -14,7 +14,6 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +29,7 @@ public class Elevator extends SubsystemBase {
   private Debouncer debounce = new Debouncer(0.2);
 
   @AutoLogOutput(key = "Elevator/Setpoint")
-  private Rotation2d elevatorSetpoint = new Rotation2d();
+  private double setpointRotations = 0.0;
 
   public Elevator() {
     var leftSparkMaxConfig = new SparkMaxConfig();
@@ -63,109 +62,89 @@ public class Elevator extends SubsystemBase {
                 rightSparkMaxConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
-    setElevatorSetpoint(getElevatorRotations());
+    setSetpointRotations(getPositionRotations());
   }
 
   private static final class constants { // arm setpoints
-    private static final Rotation2d zero = Rotation2d.fromRotations(0.0);
-    private static final Rotation2d pickUp = Rotation2d.fromRotations(0.0);
-    private static final Rotation2d levelOne = Rotation2d.fromRotations(10.0);
-    private static final Rotation2d levelTwo = Rotation2d.fromRotations(20.0);
-    private static final Rotation2d levelThree = Rotation2d.fromRotations(30.0);
-    private static final Rotation2d levelFour = Rotation2d.fromRotations(40.0);
+    private static final double zero = 0.0;
+    private static final double pickUp = 0.0;
+    private static final double levelOne = 10.0;
+    private static final double levelTwo = 20.0;
+    private static final double levelThree = 30.0;
+    private static final double levelFour = 40.0;
 
     private static final double elevetorG = 0.02;
   }
 
-  public void setElevatorSetpoint(Rotation2d setpoint) {
+  public void setSetpointRotations(double setpointRotations) {
     /*  if (setpoint.getDegrees() < -5) {
       setpoint = Rotation2d.fromDegrees(-5);
     } else if (setpoint.getDegrees() > 100) {
       setpoint = Rotation2d.fromDegrees(100);
     }
     */
-    elevatorSetpoint = setpoint;
+    this.setpointRotations = setpointRotations;
   }
 
   @AutoLogOutput(key = "Elevator/Position")
-  public Rotation2d getElevatorRotations() {
-    return Rotation2d.fromRotations(elevatorEncoder.getPosition());
+  public double getPositionRotations() {
+    return elevatorEncoder.getPosition();
   }
 
   @AutoLogOutput(key = "Elevator/Error")
-  private Rotation2d getError() {
-    Rotation2d position = getElevatorRotations();
-    Logger.recordOutput("Elevator/Debug/Position", position);
-    Rotation2d setpoint = elevatorSetpoint;
-    Logger.recordOutput("Elevator/Debug/Setpoint", setpoint);
-    Rotation2d error = position.minus(setpoint);
-    Logger.recordOutput("Elevator/Debug/Error", error);
-    System.out.println(
-        "getError(): "
-            + position.getRotations()
-            + " - "
-            + setpoint.getRotations()
-            + " = "
-            + error.getRotations());
-    return error;
+  private double getErrorRotations() {
+    return getPositionRotations() - setpointRotations;
   }
 
-  private Command positionCommand(Rotation2d position, Rotation2d tolerance) {
+  private Command positionCommand(double positionRotations, double tolerance) {
     return Commands.sequence(
-        runOnce(() -> setElevatorSetpoint(position)),
+        runOnce(() -> setSetpointRotations(positionRotations)),
         Commands.waitSeconds(0.1),
         run(() -> {}).until(() -> onTarget(tolerance)));
   }
 
-  private boolean onTarget(Rotation2d tolerance) {
-    Logger.recordOutput("Elevator/Debug/Tolerance", tolerance);
-    boolean onTarget = Math.abs(getError().getRotations()) < tolerance.getRotations();
-    Logger.recordOutput("Elevator/Debug/On Target", onTarget);
+  private boolean onTarget(double toleranceRotations) {
+    boolean onTarget = Math.abs(getErrorRotations()) < toleranceRotations;
+    Logger.recordOutput("Elevator/On Target", onTarget);
     boolean debounced = debounce.calculate(onTarget);
-    Logger.recordOutput("Elevator/Debug/Debounced On Target", debounced);
-    System.out.println(
-        "onTarget(): " + tolerance.getRotations() + " < " + onTarget + ", " + debounced);
+    Logger.recordOutput("Elevator/On Target Debounced", debounced);
     return debounced;
   }
 
   public Command defaultCommand(Supplier<Double> elevatorChange) {
     return run(
         () -> {
-          setElevatorSetpoint(
-              elevatorSetpoint.minus(Rotation2d.fromRotations(elevatorChange.get())));
+          setSetpointRotations(setpointRotations - elevatorChange.get());
         });
   }
 
   public Command pickUp() {
-    return positionCommand(constants.pickUp, Rotation2d.fromRotations(0.5));
+    return positionCommand(constants.pickUp, 0.5);
   }
 
   public Command zero() {
-    return positionCommand(constants.zero, Rotation2d.fromRotations(0.5));
+    return positionCommand(constants.zero, 0.5);
   }
 
   public Command levelOne() {
-    return positionCommand(constants.levelOne, Rotation2d.fromRotations(0.5));
+    return positionCommand(constants.levelOne, 0.5);
   }
 
   public Command levelTwo() {
-    return positionCommand(constants.levelTwo, Rotation2d.fromRotations(0.5));
+    return positionCommand(constants.levelTwo, 0.5);
   }
 
   public Command levelThree() {
-    return positionCommand(constants.levelThree, Rotation2d.fromRotations(0.5));
+    return positionCommand(constants.levelThree, 0.5);
   }
 
   public Command levelFour() {
-    return positionCommand(constants.levelFour, Rotation2d.fromRotations(0.5));
+    return positionCommand(constants.levelFour, 0.5);
   }
 
   public void periodic() {
     leftClosedLoopController.setReference(
-        elevatorSetpoint.getRotations(),
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        constants.elevetorG);
+        setpointRotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, constants.elevetorG);
 
     Logger.recordOutput("Elevator/MotorLeft", leftElevatorMotor.getAppliedOutput());
     Logger.recordOutput("Elevator/MotorRight", rightElevatorMotor.getAppliedOutput());
