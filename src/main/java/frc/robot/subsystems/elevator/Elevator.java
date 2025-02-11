@@ -29,7 +29,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMax rightElevatorMotor = new SparkMax(11, MotorType.kBrushless);
   private Debouncer debounce = new Debouncer(0.2);
 
-  @AutoLogOutput(key = "elevator/setPoint")
+  @AutoLogOutput(key = "Elevator/Setpoint")
   private Rotation2d elevatorSetpoint = new Rotation2d();
 
   public Elevator() {
@@ -87,34 +87,44 @@ public class Elevator extends SubsystemBase {
     elevatorSetpoint = setpoint;
   }
 
-  @AutoLogOutput(key = "elevator/rotations")
+  @AutoLogOutput(key = "Elevator/Position")
   public Rotation2d getElevatorRotations() {
     return Rotation2d.fromRotations(elevatorEncoder.getPosition());
   }
 
-  @AutoLogOutput(key = "elevator/error")
+  @AutoLogOutput(key = "Elevator/Error")
   private Rotation2d getError() {
     Rotation2d position = getElevatorRotations();
-    Logger.recordOutput("elevator/position", position);
-    Rotation2d setPoint = elevatorSetpoint;
-    Logger.recordOutput("elevator/setPoint", setPoint);
-    Rotation2d error = position.minus(setPoint);
-    Logger.recordOutput("elevator/error", error);
+    Logger.recordOutput("Elevator/Debug/Position", position);
+    Rotation2d setpoint = elevatorSetpoint;
+    Logger.recordOutput("Elevator/Debug/Setpoint", setpoint);
+    Rotation2d error = position.minus(setpoint);
+    Logger.recordOutput("Elevator/Debug/Error", error);
+    System.out.println(
+        "getError(): "
+            + position.getRotations()
+            + " - "
+            + setpoint.getRotations()
+            + " = "
+            + error.getRotations());
     return error;
   }
 
-  private Command positionCommand(Rotation2d position, double tolerance) {
+  private Command positionCommand(Rotation2d position, Rotation2d tolerance) {
     return Commands.sequence(
         runOnce(() -> setElevatorSetpoint(position)),
         Commands.waitSeconds(0.1),
         run(() -> {}).until(() -> onTarget(tolerance)));
   }
 
-  private boolean onTarget(double tolerance) {
-    boolean onTarget = Math.abs(getError().getRotations()) < tolerance;
-    Logger.recordOutput("elevator/onTargt", onTarget);
+  private boolean onTarget(Rotation2d tolerance) {
+    Logger.recordOutput("Elevator/Debug/Tolerance", tolerance);
+    boolean onTarget = Math.abs(getError().getRotations()) < tolerance.getRotations();
+    Logger.recordOutput("Elevator/Debug/On Target", onTarget);
     boolean debounced = debounce.calculate(onTarget);
-    Logger.recordOutput("elevator/at debouncespeed", debounced);
+    Logger.recordOutput("Elevator/Debug/Debounced On Target", debounced);
+    System.out.println(
+        "onTarget(): " + tolerance.getRotations() + " < " + onTarget + ", " + debounced);
     return debounced;
   }
 
@@ -127,27 +137,27 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command pickUp() {
-    return positionCommand(constants.pickUp, 0.5);
+    return positionCommand(constants.pickUp, Rotation2d.fromRotations(0.5));
   }
 
   public Command zero() {
-    return positionCommand(constants.zero, 0.5);
+    return positionCommand(constants.zero, Rotation2d.fromRotations(0.5));
   }
 
   public Command levelOne() {
-    return positionCommand(constants.levelOne, 0.5);
+    return positionCommand(constants.levelOne, Rotation2d.fromRotations(0.5));
   }
 
   public Command levelTwo() {
-    return positionCommand(constants.levelTwo, 0.5);
+    return positionCommand(constants.levelTwo, Rotation2d.fromRotations(0.5));
   }
 
   public Command levelThree() {
-    return positionCommand(constants.levelThree, 0.5);
+    return positionCommand(constants.levelThree, Rotation2d.fromRotations(0.5));
   }
 
   public Command levelFour() {
-    return positionCommand(constants.levelFour, 0.5);
+    return positionCommand(constants.levelFour, Rotation2d.fromRotations(0.5));
   }
 
   public void periodic() {
@@ -157,10 +167,9 @@ public class Elevator extends SubsystemBase {
         ClosedLoopSlot.kSlot0,
         constants.elevetorG);
 
-    Logger.recordOutput("elevator/MotorLeft", leftElevatorMotor.getAppliedOutput());
-    Logger.recordOutput("elevator/MotorRight", rightElevatorMotor.getAppliedOutput());
-    Logger.recordOutput("elevator/MotorLeftCurrent", leftElevatorMotor.getOutputCurrent());
-    Logger.recordOutput("elevator/MotorRightCurrent", rightElevatorMotor.getOutputCurrent());
-    Logger.recordOutput("elevator/setPointDegrees", elevatorSetpoint.getRotations());
+    Logger.recordOutput("Elevator/MotorLeft", leftElevatorMotor.getAppliedOutput());
+    Logger.recordOutput("Elevator/MotorRight", rightElevatorMotor.getAppliedOutput());
+    Logger.recordOutput("Elevator/MotorLeftCurrent", leftElevatorMotor.getOutputCurrent());
+    Logger.recordOutput("Elevator/MotorRightCurrent", rightElevatorMotor.getOutputCurrent());
   }
 }
