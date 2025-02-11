@@ -94,7 +94,13 @@ public class Elevator extends SubsystemBase {
 
   @AutoLogOutput(key = "elevator/error")
   private Rotation2d getError() {
-    return getElevatorRotations().minus(elevatorSetpoint);
+    Rotation2d position = getElevatorRotations();
+    Logger.recordOutput("elevator/position", position);
+    Rotation2d setPoint = elevatorSetpoint;
+    Logger.recordOutput("elevator/setPoint", setPoint);
+    Rotation2d error = position.minus(setPoint);
+    Logger.recordOutput("elevator/error", error);
+    return error;
   }
 
   private Command positionCommand(Rotation2d position, double tolerance) {
@@ -105,7 +111,7 @@ public class Elevator extends SubsystemBase {
   }
 
   private boolean onTarget(double tolerance) {
-    boolean onTarget = Math.abs(getError().getDegrees()) < tolerance;
+    boolean onTarget = Math.abs(getError().getRotations()) < tolerance;
     Logger.recordOutput("elevator/onTargt", onTarget);
     boolean debounced = debounce.calculate(onTarget);
     Logger.recordOutput("elevator/at debouncespeed", debounced);
@@ -121,27 +127,27 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command pickUp() {
-    return positionCommand(constants.pickUp, 1);
+    return positionCommand(constants.pickUp, 0.5);
   }
 
   public Command zero() {
-    return positionCommand(constants.zero, 1);
+    return positionCommand(constants.zero, 0.5);
   }
 
   public Command levelOne() {
-    return positionCommand(constants.levelOne, 1);
+    return positionCommand(constants.levelOne, 0.5);
   }
 
   public Command levelTwo() {
-    return positionCommand(constants.levelTwo, 1);
+    return positionCommand(constants.levelTwo, 0.5);
   }
 
   public Command levelThree() {
-    return positionCommand(constants.levelThree, 1);
+    return positionCommand(constants.levelThree, 0.5);
   }
 
   public Command levelFour() {
-    return positionCommand(constants.levelFour, 1);
+    return positionCommand(constants.levelFour, 0.5);
   }
 
   public void periodic() {
