@@ -40,13 +40,13 @@ public class GyroIOCanandgyro implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = canandgyro.isConnected();
     inputs.yawPosition = canandgyro.getRotation2d();
-    inputs.yawVelocityRadPerSec = Units.degreesToRadians(2 * canandgyro.getYaw());
+    inputs.yawVelocityRadPerSec = Units.rotationsToRadians(canandgyro.getAngularVelocityYaw());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryYawPositions =
         yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(-value))
+            .map((Double value) -> Rotation2d.fromRotations(value))
             .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
