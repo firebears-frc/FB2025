@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -30,6 +31,7 @@ import frc.robot.subsystems.drive.GyroIOCanandgyro;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.elevator.Elevator;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -41,6 +43,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Elevator m_elevator = new Elevator();
 
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -126,19 +129,19 @@ public class RobotContainer {
             () -> -rightJoystick.getX()));
 
     // Lock to 0° when A button is held
-    xboxController
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -leftJoystick.getY(),
-                () -> -leftJoystick.getX(),
-                () -> new Rotation2d()));
+    /*  xboxController
+    .a()
+    .whileTrue(
+        DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -leftJoystick.getY(),
+            () -> -leftJoystick.getX(),
+            () -> new Rotation2d())); */
 
     // Switch to X pattern when X button is pressed
-    xboxController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // leftJoystick.trigger().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0° when triger is pressed
     rightJoystick
         .trigger()
         .onTrue(
@@ -148,6 +151,15 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    // eleveator go to set point commands
+    xboxController.povUp().onTrue(m_elevator.levelFour());
+    xboxController.povDown().onTrue(m_elevator.levelOne());
+    xboxController.povRight().onTrue(m_elevator.levelTwo());
+    xboxController.povLeft().onTrue(m_elevator.levelThree());
+    xboxController.a().onTrue(m_elevator.pickUp());
+
+    m_elevator.setDefaultCommand(
+        m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
   }
 
   /**
