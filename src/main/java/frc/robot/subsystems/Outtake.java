@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -10,14 +13,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
   private SparkMax outtakeMotor = new SparkMax(12, MotorType.kBrushless);
-  private SparkClosedLoopController pid;
   private final SparkClosedLoopController outTakeController;
   private RelativeEncoder outTakeEncoder;
   private double setPoint = 0;
@@ -31,6 +32,7 @@ public class Outtake extends SubsystemBase {
     outTakeConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(outtakeCurrentLimit)
+        .secondaryCurrentLimit(50)
         .voltageCompensation(12.0);
     outTakeConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(.01, 0, 0);
     tryUntilOk(
@@ -95,7 +97,7 @@ public class Outtake extends SubsystemBase {
   @Override
   public void periodic() {
 
-    pid.setReference(setPoint, ControlType.kVelocity);
+    outTakeController.setReference(setPoint, ControlType.kVelocity);
 
     Logger.recordOutput("outTake/Output", outtakeMotor.getAppliedOutput());
     Logger.recordOutput("outTake/speed", outtakeMotor.getEncoder().getVelocity());
