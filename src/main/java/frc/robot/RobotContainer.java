@@ -156,7 +156,9 @@ public class RobotContainer {
     xboxController.povRight().onTrue(m_elevator.levelTwo());
     xboxController.povLeft().onTrue(m_elevator.levelThree());
     xboxController.a().onTrue(m_elevator.pickUp());
-    xboxController.a().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
+    xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
+    xboxController.y().onTrue(m_outtake.pauseOutTake());
+    xboxController.b().onTrue(m_outtake.reverseOutTake());
   }
 
   /**
