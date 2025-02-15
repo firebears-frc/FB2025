@@ -17,6 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,6 +33,10 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.Vision;
+
+import java.io.IOException;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -44,6 +49,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
+  //private final Vision vision;
 
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -55,6 +61,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    /*try {
+            vision = new Vision(drive::addVisionMeasurement());
+        }
+        catch(IOException e){
+            DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
+        }*/
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
