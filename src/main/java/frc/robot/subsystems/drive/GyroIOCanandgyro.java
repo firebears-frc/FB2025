@@ -18,8 +18,7 @@ package frc.robot.subsystems.drive;
 import static frc.robot.subsystems.drive.DriveConstants.gyroCanId;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
-// import com.studica.frc.AHRS;
-// import com.studica.frc.AHRS.NavXComType;
+import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.Queue;
@@ -32,6 +31,7 @@ public class GyroIOCanandgyro implements GyroIO {
   private final Canandgyro canandgyro = new Canandgyro(gyroCanId);
 
   public GyroIOCanandgyro() {
+    canandgyro.setSettings((new CanandgyroSettings().setYawFramePeriod(.01)));
     yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
     yawPositionQueue = SparkOdometryThread.getInstance().registerSignal(canandgyro::getYaw);
   }
