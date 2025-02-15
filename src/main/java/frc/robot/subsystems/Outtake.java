@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -15,17 +16,12 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Outtake extends SubsystemBase {
-  private SparkMax outtakeMotor;
+  private SparkMax outtakeMotor = new SparkMax(12, MotorType.kBrushless);
   private SparkClosedLoopController pid;
   private final SparkClosedLoopController outTakeController;
-  private SparkMax outTakeSpark;
   private RelativeEncoder outTakeEncoder;
   private double setPoint = 0;
-  private final boolean turnInverted = false;
-  private final boolean turnEncoderInverted = false;
-  private static final int turnMotorCurrentLimit = 30;
-  private static final double turnEncoderPositionFactor = 1.0;
-  private static final double turnEncoderVelocityFactor = 1.0;
+  private static final int outtakeCurrentLimit = 30;
 
   public Outtake() {
 
@@ -33,16 +29,15 @@ public class Outtake extends SubsystemBase {
     outTakeController = outtakeMotor.getClosedLoopController();
     var outTakeConfig = new SparkMaxConfig();
     outTakeConfig
-        .inverted(turnInverted)
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(turnMotorCurrentLimit)
+        .smartCurrentLimit(outtakeCurrentLimit)
         .voltageCompensation(12.0);
     outTakeConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(.01, 0, 0);
     tryUntilOk(
-        outTakeSpark,
+        outtakeMotor,
         5,
         () ->
-            outTakeSpark.configure(
+            outtakeMotor.configure(
                 outTakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
@@ -66,9 +61,7 @@ public class Outtake extends SubsystemBase {
 
   @AutoLogOutput(key = "outtake/atSpeed")
   private boolean atSpeed() {
-    if (getError() < 100 && getError() > -100) {
-      return true;
-    } else return false;
+    return getError() < 100 && getError() > -100;
   }
 
   public Command outtakeCoral() {

@@ -13,10 +13,7 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -35,6 +32,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -45,8 +43,8 @@ import frc.robot.subsystems.elevator.Elevator;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
- private final Elevator m_elevator = new Elevator();
-   private final Outtake m_outtake = new Outtake();
+  private final Elevator m_elevator = new Elevator();
+  private final Outtake m_outtake = new Outtake();
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
