@@ -14,7 +14,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -25,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOCanandgyro;
@@ -44,7 +44,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
-
+  private final Outtake m_outtake = new Outtake();
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
@@ -151,15 +151,14 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    // eleveator go to set point commands
     xboxController.povUp().onTrue(m_elevator.levelFour());
     xboxController.povDown().onTrue(m_elevator.levelOne());
     xboxController.povRight().onTrue(m_elevator.levelTwo());
     xboxController.povLeft().onTrue(m_elevator.levelThree());
     xboxController.a().onTrue(m_elevator.pickUp());
-
-    m_elevator.setDefaultCommand(
-        m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
+    xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
+    xboxController.y().onTrue(m_outtake.pauseOutTake());
+    xboxController.b().onTrue(m_outtake.reverseOutTake());
   }
 
   /**
