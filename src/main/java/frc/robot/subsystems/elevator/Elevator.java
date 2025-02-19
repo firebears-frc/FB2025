@@ -1,6 +1,6 @@
 package frc.robot.subsystems.elevator;
 
-import static frc.robot.util.SparkUtil.*;
+import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -72,7 +72,7 @@ public class Elevator extends SubsystemBase {
 
   private static final class constants { // arm setpoints
     private static final double zero = 0.0;
-    private static final double pickUp = 0.0;
+    private static final double pickUp = 6.5;
     private static final double levelOne = 17.0;
     private static final double levelTwo = 30;
     private static final double levelThree = 47;
