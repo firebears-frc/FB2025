@@ -4,6 +4,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,15 +26,18 @@ public class Vision extends SubsystemBase {
   private final PhotonCamera photonCamera;
   private final PhotonPoseEstimator poseEstimator;
   private final Consumer<VisionData> consumer;
+  private final String name;
 
-  public Vision(Consumer<VisionData> consumer) throws IOException {
-    photonCamera = new PhotonCamera(Constants.VisionConstants.kCameraName);
+  public Vision(Consumer<VisionData> consumer, Transform3d cameraOffSet, String name)
+      throws IOException {
+    photonCamera = new PhotonCamera(name);
     poseEstimator =
         new PhotonPoseEstimator(
-            AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+            AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField),
             PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            Constants.VisionConstants.kCameraOffset);
+            cameraOffSet);
     this.consumer = consumer;
+    this.name = name;
   }
 
   private Matrix<N3, N1> getStdDevs(List<PhotonTrackedTarget> targets, Pose3d estimatedPose) {
@@ -78,12 +82,12 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     boolean connected = photonCamera.isConnected();
-    Logger.recordOutput("Vision/Connected", connected);
+    Logger.recordOutput("Vision/" + name + "/Connected", connected);
     if (!connected) return;
 
     PhotonPipelineResult pipelineResult = photonCamera.getLatestResult();
     boolean hasTargets = pipelineResult.hasTargets();
-    Logger.recordOutput("Vision/HasTargets", hasTargets);
+    Logger.recordOutput("Vision/" + name + "/HasTargets", hasTargets);
     if (!hasTargets) return;
 
     List<PhotonTrackedTarget> badTargets = new ArrayList<>();
@@ -94,19 +98,20 @@ public class Vision extends SubsystemBase {
     }
 
     pipelineResult.targets.removeAll(badTargets);
-    Logger.recordOutput("Vision/badTargets", badTargets.size());
+    Logger.recordOutput("Vision/" + name + "/badTargets", badTargets.size());
 
     Optional<EstimatedRobotPose> poseResult = poseEstimator.update(pipelineResult);
     boolean posePresent = poseResult.isPresent();
-    Logger.recordOutput("Vision/HasPose", posePresent);
+    Logger.recordOutput("Vision/" + name + "/HasPose", posePresent);
     if (!posePresent) return;
 
     EstimatedRobotPose estimatedPose = poseResult.get();
-    Logger.recordOutput("Vision/Pose", estimatedPose.estimatedPose);
-    Logger.recordOutput("Vision/Timestamp", estimatedPose.timestampSeconds);
-    Logger.recordOutput("Vision/Targets", estimatedPose.targetsUsed.size());
-    Logger.recordOutput("Vision/Strategy", estimatedPose.strategy);
-    Logger.recordOutput("Vision/ambiguity", estimatedPose.targetsUsed.get(0).getPoseAmbiguity());
+    Logger.recordOutput("Vision/" + name + "/Pose", estimatedPose.estimatedPose);
+    Logger.recordOutput("Vision/" + name + "/Timestamp", estimatedPose.timestampSeconds);
+    Logger.recordOutput("Vision/" + name + "/Targets", estimatedPose.targetsUsed.size());
+    Logger.recordOutput("Vision/" + name + "/Strategy", estimatedPose.strategy);
+    Logger.recordOutput(
+        "Vision/" + name + "/ambiguity", estimatedPose.targetsUsed.get(0).getPoseAmbiguity());
 
     Matrix<N3, N1> stdDevs = getStdDevs(pipelineResult.targets, estimatedPose.estimatedPose);
     if (stdDevs == null) {

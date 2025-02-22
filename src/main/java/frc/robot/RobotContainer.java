@@ -35,6 +35,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import java.io.IOException;
+import java.util.List;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -47,7 +48,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
-  private Vision vision;
+  private List<Vision> visions;
 
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -94,7 +95,12 @@ public class RobotContainer {
         break;
     }
     try {
-      vision = new Vision(drive::addVisionMeasurement);
+      visions =
+          List.of(
+              new Vision(
+                  drive::addVisionMeasurement,
+                  Constants.VisionConstants.kCameraOffset,
+                  Constants.VisionConstants.kCameraName));
     } catch (IOException e) {
       DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
     }
