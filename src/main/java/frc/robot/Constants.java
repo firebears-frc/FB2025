@@ -13,6 +13,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -33,5 +42,20 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  public static final class VisionConstants {
+    public static final String kCameraName = "Arducam_OV2311_USB_Camera";
+    public static final Transform3d kCameraOffset =
+        new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(-11.5), Units.inchesToMeters(0), Units.inchesToMeters(13.00)),
+            new Rotation3d(
+                Rotation2d.fromDegrees(180).getRadians(),
+                Rotation2d.fromDegrees(-30.0).getRadians(),
+                Rotation2d.fromDegrees(180).getRadians()));
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS =
+        VecBuilder.fill(1.50, 1.50, 2 * Math.PI);
+    public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.30, 0.30, Math.PI);
   }
 }
