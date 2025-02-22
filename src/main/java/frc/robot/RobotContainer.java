@@ -15,6 +15,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -33,6 +34,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -50,6 +52,43 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
   private final CommandXboxController xboxController = new CommandXboxController(2);
+
+  private void configureAutoCommands() {
+    NamedCommands.registerCommands(
+        Map.of(
+            "placeL1",
+                Commands.sequence(
+                    m_elevator.levelOne(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL2",
+                Commands.sequence(
+                    m_elevator.levelTwo(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL3",
+                Commands.sequence(
+                    m_elevator.levelThree(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL4",
+                Commands.sequence(
+                    m_elevator.levelFour(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp())));
+  }
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -92,6 +131,7 @@ public class RobotContainer {
     }
 
     // Set up auto routines
+    configureAutoCommands();
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
