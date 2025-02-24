@@ -14,11 +14,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-<<<<<<< HEAD
 import com.pathplanner.lib.auto.NamedCommands;
-=======
 import edu.wpi.first.math.MathUtil;
->>>>>>> 512181cd81fd8b52092cea1df33e682fef31a209
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
