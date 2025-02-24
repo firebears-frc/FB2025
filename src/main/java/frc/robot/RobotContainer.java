@@ -198,7 +198,7 @@ public class RobotContainer {
     xboxController.povLeft().onTrue(m_elevator.levelThree());
     xboxController.a().onTrue(Commands.sequence(m_elevator.zero(), m_elevator.pickUp()));
     xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
-    xboxController.y().onTrue(m_outtake.pauseOutTake());
+    xboxController.y().onTrue(m_elevator.zero());
     xboxController.b().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
 
     m_elevator.setDefaultCommand(
