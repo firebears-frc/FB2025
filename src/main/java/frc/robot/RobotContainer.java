@@ -14,7 +14,11 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+<<<<<<< HEAD
 import com.pathplanner.lib.auto.NamedCommands;
+=======
+import edu.wpi.first.math.MathUtil;
+>>>>>>> 512181cd81fd8b52092cea1df33e682fef31a209
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -195,10 +199,13 @@ public class RobotContainer {
     xboxController.povDown().onTrue(m_elevator.levelOne());
     xboxController.povRight().onTrue(m_elevator.levelTwo());
     xboxController.povLeft().onTrue(m_elevator.levelThree());
-    xboxController.a().onTrue(m_elevator.pickUp());
+    xboxController.a().onTrue(Commands.sequence(m_elevator.zero(), m_elevator.pickUp()));
     xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
     xboxController.y().onTrue(m_outtake.pauseOutTake());
-    xboxController.b().onTrue(m_outtake.reverseOutTake());
+    xboxController.b().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
+
+    m_elevator.setDefaultCommand(
+        m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
   }
 
   /**
