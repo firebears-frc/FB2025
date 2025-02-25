@@ -18,8 +18,9 @@ import org.littletonrobotics.junction.Logger;
 public class Outtake extends SubsystemBase {
   private SparkMax outtakeMotor = new SparkMax(12, MotorType.kBrushless);
   private final SparkClosedLoopController outTakeController;
-  private RelativeEncoder outTakeEncoder;
-  private double setPoint = 0;
+  private RelativeEncoder encoder;
+  private double setPoint = 0; // velocity
+  private double position = 0;
   private static final int outtakeCurrentLimit = 30;
 
   public Outtake() {
@@ -37,6 +38,9 @@ public class Outtake extends SubsystemBase {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pidf(.00007, 0.0, 0.0, 1.774691358024691e-4);
     // ff: 1.774691358024691e-4
+
+    encoder = outtakeMotor.getEncoder();
+    position = encoder.getPosition();
 
     tryUntilOk(
         outtakeMotor,
@@ -61,7 +65,7 @@ public class Outtake extends SubsystemBase {
 
   @AutoLogOutput(key = "outtake/error")
   private double getError() {
-    return setPoint - outtakeMotor.getEncoder().getVelocity();
+    return setPoint - encoder.getVelocity();
   }
 
   @AutoLogOutput(key = "outtake/atSpeed")
@@ -72,7 +76,7 @@ public class Outtake extends SubsystemBase {
   public Command outtakeCoral() {
     return runOnce(
         () -> {
-          setPoint = 7000;
+          setPoint = 5000;
         });
   }
 
@@ -86,7 +90,7 @@ public class Outtake extends SubsystemBase {
   public Command reverseOutTake() {
     return runOnce(
         () -> {
-          setPoint = -7000;
+          setPoint = -5000;
         });
   }
 
@@ -103,7 +107,7 @@ public class Outtake extends SubsystemBase {
     outTakeController.setReference(setPoint, ControlType.kVelocity);
 
     Logger.recordOutput("outTake/Output", outtakeMotor.getAppliedOutput());
-    Logger.recordOutput("outTake/speed", outtakeMotor.getEncoder().getVelocity());
+    Logger.recordOutput("outTake/speed", encoder.getVelocity());
     Logger.recordOutput("outTake/setPoint", setPoint);
   }
 }
