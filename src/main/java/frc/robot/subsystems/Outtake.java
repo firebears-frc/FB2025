@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -19,10 +18,10 @@ import org.littletonrobotics.junction.Logger;
 public class Outtake extends SubsystemBase {
   private SparkMax outtakeMotor = new SparkMax(12, MotorType.kBrushless);
   private final SparkClosedLoopController outTakeController;
-  private RelativeEncoder outTakeEncoder;
   private SparkLimitSwitch beamBreak = outtakeMotor.getForwardLimitSwitch();
   private double setPoint = 0;
   private static final int outtakeCurrentLimit = 30;
+
   @AutoLogOutput(key = "outtake/hasCoral")
   private boolean hasCoral = false;
 
@@ -78,13 +77,6 @@ public class Outtake extends SubsystemBase {
     return getError() < 100 && getError() > -100;
   }
 
-  public Command outtakeCoral() {
-    return runOnce(
-        () -> {
-          setPoint = 7000;
-        });
-  }
-
   public Command placeCoral() {
     return runOnce(
         () -> {
@@ -95,7 +87,7 @@ public class Outtake extends SubsystemBase {
   public Command reverseOutTake() {
     return runOnce(
         () -> {
-          setPoint = -7000;
+          setPoint = -5000;
         });
   }
 
