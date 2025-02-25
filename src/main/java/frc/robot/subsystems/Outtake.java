@@ -20,7 +20,8 @@ public class Outtake extends SubsystemBase {
   private final SparkClosedLoopController outTakeController;
   private RelativeEncoder encoder;
   private double setPoint = 0; // velocity
-  private double position = 0;
+  private double startPosition = 0;
+  private double setPosition = 0;
   private static final int outtakeCurrentLimit = 30;
 
   public Outtake() {
@@ -40,7 +41,7 @@ public class Outtake extends SubsystemBase {
     // ff: 1.774691358024691e-4
 
     encoder = outtakeMotor.getEncoder();
-    position = encoder.getPosition();
+    startPosition = setPosition = encoder.getPosition();
 
     tryUntilOk(
         outtakeMotor,
@@ -98,6 +99,21 @@ public class Outtake extends SubsystemBase {
     return runOnce(
         () -> {
           setPoint = 0;
+        });
+  }
+
+  public Command incrementPosition() {
+    return runOnce(
+        () -> {
+          setPosition += 100;
+        });
+  }
+
+  public Command decrementPosition() {
+    return runOnce(
+        () -> {
+          double newPosition = setPosition - 100;
+          setPosition = startPosition > newPosition ? startPosition : newPosition;
         });
   }
 
