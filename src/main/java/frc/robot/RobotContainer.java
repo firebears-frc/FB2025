@@ -17,6 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -33,6 +35,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import java.io.IOException;
+import java.util.List;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -45,6 +49,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
+  private List<Vision> visions;
   private final Outtake m_outtake = new Outtake();
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
@@ -89,6 +94,16 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         break;
+    }
+    try {
+      visions =
+          List.of(
+              new Vision(
+                  drive::addVisionMeasurement,
+                  Constants.VisionConstants.kCameraOffset,
+                  Constants.VisionConstants.kCameraName));
+    } catch (IOException e) {
+      DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
     }
 
     // Set up auto routines
