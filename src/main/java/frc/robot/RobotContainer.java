@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOCanandgyro;
@@ -49,7 +50,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
   private List<Vision> visions;
-
+  private final Outtake m_outtake = new Outtake();
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
@@ -166,12 +167,14 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    // eleveator go to set point commands
     xboxController.povUp().onTrue(m_elevator.levelFour());
     xboxController.povDown().onTrue(m_elevator.levelOne());
     xboxController.povRight().onTrue(m_elevator.levelTwo());
     xboxController.povLeft().onTrue(m_elevator.levelThree());
     xboxController.a().onTrue(m_elevator.pickUp());
+    xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
+    xboxController.y().onTrue(m_outtake.pauseOutTake());
+    xboxController.b().onTrue(m_outtake.reverseOutTake());
 
     m_elevator.setDefaultCommand(
         m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
