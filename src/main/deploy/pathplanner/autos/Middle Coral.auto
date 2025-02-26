@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "One Coral Middle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Get Coral Middle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Place Coral Middle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placeL4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
