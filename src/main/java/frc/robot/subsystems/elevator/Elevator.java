@@ -72,10 +72,10 @@ public class Elevator extends SubsystemBase {
 
   private static final class constants { // arm setpoints
     private static final double zero = 0.0;
-    private static final double pickUp = 6.5;
+    private static final double pickUp = 0.0;
     private static final double levelOne = 17.0;
-    private static final double levelTwo = 30;
-    private static final double levelThree = 47;
+    private static final double levelTwo = 32.0;
+    private static final double levelThree = 50.0;
     private static final double levelFour = 75;
 
     private static final double elevetorG = 0.02;
@@ -84,8 +84,8 @@ public class Elevator extends SubsystemBase {
   public void setSetpointRotations(double setpointRotations) {
     if (setpointRotations < 0) {
       setpointRotations = 0;
-    } else if (setpointRotations > 75) {
-      setpointRotations = 75;
+    } else if (setpointRotations > 80) {
+      setpointRotations = 80;
     }
 
     this.setpointRotations = setpointRotations;

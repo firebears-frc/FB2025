@@ -80,7 +80,14 @@ public class Outtake extends SubsystemBase {
   public Command placeCoral() {
     return runOnce(
         () -> {
-          setPoint = 5000;
+          setPoint = 1000;
+        });
+  }
+
+  public Command slowPlaceCoral() {
+    return runOnce(
+        () -> {
+          setPoint = -1000;
         });
   }
 
