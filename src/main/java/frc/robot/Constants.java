@@ -43,7 +43,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
-
+  // 11z 7x 19.5y
   public static final class VisionConstants {
     public static final String kCameraName = "Arducam_OV2311_USB_Camera";
     public static final Transform3d kCameraOffset =

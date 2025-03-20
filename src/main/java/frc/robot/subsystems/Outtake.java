@@ -77,10 +77,10 @@ public class Outtake extends SubsystemBase {
     return getError() < 100 && getError() > -100;
   }
 
-  public Command placeCoral() {
+  public Command reverseOutTake() {
     return runOnce(
         () -> {
-          setPoint = 1000;
+          setPoint = 5000;
         });
   }
 
@@ -91,7 +91,7 @@ public class Outtake extends SubsystemBase {
         });
   }
 
-  public Command reverseOutTake() {
+  public Command placeCoral() {
     return runOnce(
         () -> {
           setPoint = -5000;

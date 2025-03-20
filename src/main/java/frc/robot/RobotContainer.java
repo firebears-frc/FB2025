@@ -14,13 +14,12 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -28,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.Outtake;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOCanandgyro;
@@ -36,8 +34,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
-import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -50,12 +47,48 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
-  private List<Vision> visions;
   private final Outtake m_outtake = new Outtake();
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
   private final CommandXboxController xboxController = new CommandXboxController(2);
+
+  private void configureAutoCommands() {
+    NamedCommands.registerCommands(
+        Map.of(
+            "placeL1",
+                Commands.sequence(
+                    m_elevator.levelOne(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL2",
+                Commands.sequence(
+                    m_elevator.levelTwo(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL3",
+                Commands.sequence(
+                    m_elevator.levelThree(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL4",
+                Commands.sequence(
+                    m_elevator.levelFour(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp())));
+  }
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -96,20 +129,10 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
-    try {
-      visions =
-          List.of(
-              new Vision(
-                  drive::addVisionMeasurement,
-                  Constants.VisionConstants.kCameraOffset,
-                  Constants.VisionConstants.kCameraName));
-    } catch (IOException e) {
-      DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
-    }
 
     // Set up auto routines
+    configureAutoCommands();
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    SmartDashboard.putData("testauto", autoChooser.getSendableChooser());
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -170,14 +193,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
     xboxController.povUp().onTrue(m_elevator.levelFour());
-    xboxController.povDown().onTrue(m_elevator.levelOne());
+    xboxController.povDown().onTrue(m_elevator.zero());
     xboxController.povRight().onTrue(m_elevator.levelTwo());
     xboxController.povLeft().onTrue(m_elevator.levelThree());
-    xboxController.a().onTrue(m_elevator.pickUp());
-    xboxController.b().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
-    xboxController.y().onTrue(m_outtake.slowPlaceCoral()).onFalse(m_outtake.pauseOutTake());
-    xboxController.x().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
 
+    xboxController.y().onTrue(m_outtake.slowPlaceCoral()).onFalse(m_outtake.pauseOutTake());
+    xboxController.b().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
+    xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
+
+    /*xboxController.leftTrigger().onTrue(m_elevator.levelTwo());
+    xboxController.leftTrigger().onTrue(m_elevator.levelThree());
+    xboxController.rightBumper().onTrue(m_elevator.levelOne());
+    xboxController.leftBumper().onTrue(m_elevator.levelFour());
+    */
     m_elevator.setDefaultCommand(
         m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
   }
