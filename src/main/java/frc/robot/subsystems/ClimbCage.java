@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -19,10 +18,10 @@ import org.littletonrobotics.junction.Logger;
 public class ClimbCage extends SubsystemBase {
   private SparkMax ClimbCageMotor = new SparkMax(8, MotorType.kBrushless);
   private final SparkClosedLoopController ClimbCageController;
-  private RelativeEncoder ClimbCageEncoder;
   private double setPoint = 0;
   private double armPosition = 0;
-  private boolean goUpright = false;
+  private boolean reset = false;
+  private double resetPosition = 0;
   private static AbsoluteEncoder shoulderEncoder;
 
   private static final int ClimbCageCurrentLimit = 30;
@@ -73,7 +72,8 @@ public class ClimbCage extends SubsystemBase {
     return getError() < 100 && getError() > -100;
   }
 
-  public Command ClimbCageCoral() {
+  public Command climbCage() {
+    reset = false;
     return runOnce(
         () -> {
           setPoint = 70;
@@ -81,27 +81,26 @@ public class ClimbCage extends SubsystemBase {
   }
 
   public Command resetClimber() {
-    if (armPosition > 0 && armPosition <= 50) {
+    reset = true;
+    if (armPosition >= resetPosition) {
       return runOnce(
           () -> {
-            setPoint = -70;
-            goUpright = true;
-          });
-    } else if (armPosition > 50 && armPosition != 0) {
-      return runOnce(
-          () -> {
-            setPoint = 70;
-            goUpright = true;
+            setPoint = -50;
+            System.out.println("Set Point: " + setPoint);
+            System.out.println("Arm Position: " + armPosition);
           });
     } else {
       return runOnce(
           () -> {
-            setPoint = 0;
+            setPoint = 50;
+            System.out.println("Set Point: " + setPoint);
+            System.out.println("Arm Position: " + armPosition);
           });
     }
   }
 
   public Command reverseClimbCage() {
+    reset = false;
     return runOnce(
         () -> {
           setPoint = -100;
@@ -109,6 +108,7 @@ public class ClimbCage extends SubsystemBase {
   }
 
   public Command pauseClimbCage() {
+    reset = false;
     return runOnce(
         () -> {
           setPoint = 0;
@@ -119,22 +119,28 @@ public class ClimbCage extends SubsystemBase {
   public void periodic() {
 
     armPosition = shoulderEncoder.getPosition();
-    if (armPosition >= .25 && armPosition <= .50) {
+    if (armPosition > .50) {
+      armPosition = armPosition - 1;
+    }
+    if (armPosition >= .25) {
       if (setPoint > 0) {
         setPoint = 0;
       }
     }
-    if (armPosition <= .75 && armPosition > .50) {
+    if (armPosition <= -.25) {
       if (setPoint < 0) {
         setPoint = 0;
       }
     }
-    if (goUpright == true) {
-      if (armPosition > .99 || armPosition < .01) {
+    System.out.println("Set Point: " + setPoint);
+    System.out.println("Arm Position: " + armPosition);
+    if (reset) {
+      if ((armPosition < resetPosition + 0.02) && (armPosition > resetPosition - 0.02)) {
         setPoint = 0;
-        goUpright = false;
+        reset = false;
       }
     }
+
     ClimbCageController.setReference(setPoint, ControlType.kVelocity);
 
     Logger.recordOutput("ClimbCage/Output", ClimbCageMotor.getAppliedOutput());
