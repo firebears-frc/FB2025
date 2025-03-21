@@ -20,7 +20,7 @@ public class ClimbCage extends SubsystemBase {
   private final SparkClosedLoopController ClimbCageController;
   private double setPoint = 0;
   private double armPosition = 0;
-  private boolean reset = false;
+  private boolean climberReset = false;
   private double resetPosition = 0;
   private static AbsoluteEncoder shoulderEncoder;
 
@@ -38,8 +38,7 @@ public class ClimbCage extends SubsystemBase {
         .voltageCompensation(12.0);
     ClimbCageConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(.00007, 0.0, 0.0, 1.774691358024691e-4);
-    // ff: 1.774691358024691e-4
+        .pidf(.0001, 0.0, 0.0, 1.774691358024691e-4);
 
     tryUntilOk(
         ClimbCageMotor,
@@ -73,7 +72,7 @@ public class ClimbCage extends SubsystemBase {
   }
 
   public Command climbCage() {
-    reset = false;
+    climberReset = false;
     return runOnce(
         () -> {
           setPoint = 70;
@@ -81,26 +80,23 @@ public class ClimbCage extends SubsystemBase {
   }
 
   public Command resetClimber() {
-    reset = true;
-    if (armPosition >= resetPosition) {
-      return runOnce(
-          () -> {
+    return runOnce(
+        () -> {
+          climberReset = true;
+          if (armPosition >= resetPosition) {
             setPoint = -50;
             System.out.println("Set Point: " + setPoint);
             System.out.println("Arm Position: " + armPosition);
-          });
-    } else {
-      return runOnce(
-          () -> {
+          } else {
             setPoint = 50;
             System.out.println("Set Point: " + setPoint);
             System.out.println("Arm Position: " + armPosition);
-          });
-    }
+          }
+        });
   }
 
   public Command reverseClimbCage() {
-    reset = false;
+    climberReset = false;
     return runOnce(
         () -> {
           setPoint = -100;
@@ -108,7 +104,7 @@ public class ClimbCage extends SubsystemBase {
   }
 
   public Command pauseClimbCage() {
-    reset = false;
+    climberReset = false;
     return runOnce(
         () -> {
           setPoint = 0;
@@ -134,10 +130,12 @@ public class ClimbCage extends SubsystemBase {
     }
     System.out.println("Set Point: " + setPoint);
     System.out.println("Arm Position: " + armPosition);
-    if (reset) {
-      if ((armPosition < resetPosition + 0.02) && (armPosition > resetPosition - 0.02)) {
+    if (climberReset == true) {
+      if ((armPosition < resetPosition + 0.05) && (armPosition > resetPosition - 0.05)) {
+        System.out.println("Set Point: " + setPoint);
         setPoint = 0;
-        reset = false;
+        System.out.println("Reset turns back to false");
+        climberReset = false;
       }
     }
 
@@ -146,5 +144,6 @@ public class ClimbCage extends SubsystemBase {
     Logger.recordOutput("ClimbCage/Output", ClimbCageMotor.getAppliedOutput());
     Logger.recordOutput("ClimbCage/speed", ClimbCageMotor.getEncoder().getVelocity());
     Logger.recordOutput("ClimbCage/setPoint", setPoint);
+    Logger.recordOutput("ClimbCage/reset", climberReset);
   }
 }
