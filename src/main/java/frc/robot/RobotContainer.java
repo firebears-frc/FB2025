@@ -15,6 +15,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +54,8 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
   private final CommandXboxController xboxController = new CommandXboxController(2);
+  // Sensors
+  private final UsbCamera driveCamera;
 
   private void configureAutoCommands() {
     NamedCommands.registerCommands(
@@ -151,6 +155,8 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
+    driveCamera = CameraServer.startAutomaticCapture();
+    driveCamera.setResolution(320, 240);
     configureButtonBindings();
   }
 
