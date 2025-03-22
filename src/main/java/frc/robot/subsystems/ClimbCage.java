@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ClimbCage extends SubsystemBase {
-  private SparkMax ClimbCageMotor = new SparkMax(8, MotorType.kBrushless);
+  private SparkMax ClimbCageMotor = new SparkMax(13, MotorType.kBrushless);
   private final SparkClosedLoopController ClimbCageController;
   // Adjust to desired value  -- change
   private double slowSpeed = 150;
@@ -28,11 +28,21 @@ public class ClimbCage extends SubsystemBase {
   // Might need to change upon install
   private double setPointDirection = -1;
   // Won't need to change these
+  @AutoLogOutput(key = "ClimbCage/Setpoint")
   private double setPoint = 0;
+
+  @AutoLogOutput(key = "ClimbCage/Position")
   private double armPosition = 0;
+
+  @AutoLogOutput(key = "ClimbCage/out")
   private boolean climberOut = false;
+
+  @AutoLogOutput(key = "ClimbCage/in")
   private boolean climberIn = false;
+
+  @AutoLogOutput(key = "ClimbCage/reset")
   private boolean climberReset = false;
+
   private static AbsoluteEncoder shoulderEncoder;
 
   private static final int ClimbCageCurrentLimit = 30;
@@ -142,12 +152,8 @@ public class ClimbCage extends SubsystemBase {
           climberIn = false;
           if (armPosition >= resetPosition) {
             setPoint = -setPointSpeed * setPointDirection;
-            System.out.println("Set Point: " + setPoint);
-            System.out.println("Arm Position: " + armPosition);
           } else {
             setPoint = setPointSpeed * setPointDirection;
-            System.out.println("Set Point: " + setPoint);
-            System.out.println("Arm Position: " + armPosition);
           }
         });
   }
@@ -160,12 +166,8 @@ public class ClimbCage extends SubsystemBase {
           climberReset = false;
           if (armPosition >= outPosition) {
             setPoint = -setPointSpeed * setPointDirection;
-            System.out.println("Set Point: " + setPoint);
-            System.out.println("Arm Position: " + armPosition);
           } else {
             setPoint = setPointSpeed * setPointDirection;
-            System.out.println("Set Point: " + setPoint);
-            System.out.println("Arm Position: " + armPosition);
           }
         });
   }
@@ -178,25 +180,21 @@ public class ClimbCage extends SubsystemBase {
           climberReset = false;
           if (armPosition >= inPosition) {
             setPoint = -setPointSpeed * setPointDirection;
-            System.out.println("Set Point: " + setPoint);
-            System.out.println("Arm Position: " + armPosition);
           } else {
             setPoint = setPointSpeed * setPointDirection;
-            System.out.println("Set Point: " + setPoint);
-            System.out.println("Arm Position: " + armPosition);
           }
         });
   }
 
   @Override
   public void periodic() {
-
     if (shoulderEncoder.getPosition() < .50) {
       armPosition = shoulderEncoder.getPosition();
     }
     if (shoulderEncoder.getPosition() > .50) {
       armPosition = shoulderEncoder.getPosition() - 1;
     }
+
     // setPoint based inequalities may need to be flipped upon install -- change
     if (armPosition >= .25) {
       if (setPoint < 0) {
@@ -208,11 +206,8 @@ public class ClimbCage extends SubsystemBase {
         setPoint = 0;
       }
     }
-    System.out.println("Set Point: " + setPoint);
-    System.out.println("Arm Position: " + armPosition);
     if (climberReset == true) {
       if ((armPosition < resetPosition + 0.01) && (armPosition > resetPosition - 0.01)) {
-        System.out.println("Set Point: " + setPoint);
         setPoint = 0;
         System.out.println("climberReset turns back to false");
         climberReset = false;
@@ -220,7 +215,6 @@ public class ClimbCage extends SubsystemBase {
     }
     if (climberIn == true) {
       if ((armPosition < inPosition + 0.01) && (armPosition > inPosition - 0.01)) {
-        System.out.println("Set Point: " + setPoint);
         setPoint = 0;
         System.out.println("climberIn turns back to false");
         climberIn = false;
@@ -228,7 +222,6 @@ public class ClimbCage extends SubsystemBase {
     }
     if (climberOut == true) {
       if ((armPosition < outPosition + 0.01) && (armPosition > outPosition - 0.01)) {
-        System.out.println("Set Point: " + setPoint);
         setPoint = 0;
         System.out.println("climberOut turns back to false");
         climberOut = false;
