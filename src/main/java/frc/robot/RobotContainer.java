@@ -29,6 +29,10 @@ import frc.robot.subsystems.drive.GyroIOCanandGyro;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.outtake.Outtake;
+import frc.robot.subsystems.outtake.OuttakeIO;
+import frc.robot.subsystems.outtake.OuttakeIOSim;
+import frc.robot.subsystems.outtake.OuttakeIOSparkMax;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -40,6 +44,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Outtake outtake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -59,6 +64,7 @@ public class RobotContainer {
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
+        outtake = new Outtake(new OuttakeIOSparkMax());
         break;
 
       case SIM:
@@ -70,6 +76,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
+        outtake = new Outtake(new OuttakeIOSim());
         break;
 
       default:
@@ -81,6 +88,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        outtake = new Outtake(new OuttakeIO() {});
         break;
     }
 
@@ -145,6 +153,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    controller.x().onTrue(outtake.out()).onFalse(outtake.stop());
+    controller.y().onTrue(outtake.in()).onFalse(outtake.stop());
+    controller.start().onTrue(outtake.eject()).onFalse(outtake.stop());
+    controller.back().onTrue(outtake.reverse()).onFalse(outtake.stop());
   }
 
   /**

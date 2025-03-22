@@ -15,6 +15,9 @@ package frc.robot.util;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -58,5 +61,14 @@ public class SparkUtil {
         sparkStickyFault = true;
       }
     }
+  }
+
+  public static void configure(SparkBase spark, SparkBaseConfig config) {
+    tryUntilOk(
+        spark,
+        5,
+        () ->
+            spark.configure(
+                config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 }
