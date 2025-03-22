@@ -15,6 +15,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +54,45 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
   private final CommandXboxController xboxController = new CommandXboxController(2);
+  // Sensors
+  private final UsbCamera driveCamera;
+
+  private void configureAutoCommands() {
+    NamedCommands.registerCommands(
+        Map.of(
+            "placeL1",
+                Commands.sequence(
+                    m_elevator.levelOne(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL2",
+                Commands.sequence(
+                    m_elevator.levelTwo(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL3",
+                Commands.sequence(
+                    m_elevator.levelThree(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp()),
+            "placeL4",
+                Commands.sequence(
+                    m_elevator.levelFour(),
+                    Commands.waitSeconds(1),
+                    m_outtake.placeCoral(),
+                    Commands.waitSeconds(1),
+                    m_outtake.pauseOutTake(),
+                    m_elevator.pickUp())));
+  }
 
   private void configureAutoCommands() {
     NamedCommands.registerCommands(
@@ -151,6 +192,8 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
+    driveCamera = CameraServer.startAutomaticCapture();
+    driveCamera.setResolution(320, 240);
     configureButtonBindings();
   }
 
@@ -193,14 +236,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
     xboxController.povUp().onTrue(m_elevator.levelFour());
-    xboxController.povDown().onTrue(m_elevator.levelOne());
+    xboxController.povDown().onTrue(m_elevator.zero());
     xboxController.povRight().onTrue(m_elevator.levelTwo());
     xboxController.povLeft().onTrue(m_elevator.levelThree());
-    xboxController.a().onTrue(Commands.sequence(m_elevator.zero(), m_elevator.pickUp()));
-    xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
-    xboxController.y().onTrue(m_elevator.zero());
-    xboxController.b().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
 
+    xboxController.y().onTrue(m_outtake.slowPlaceCoral()).onFalse(m_outtake.pauseOutTake());
+    xboxController.b().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
+    xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
+
+    /*xboxController.leftTrigger().onTrue(m_elevator.levelTwo());
+    xboxController.leftTrigger().onTrue(m_elevator.levelThree());
+    xboxController.rightBumper().onTrue(m_elevator.levelOne());
+    xboxController.leftBumper().onTrue(m_elevator.levelFour());
+    */
     m_elevator.setDefaultCommand(
         m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
   }

@@ -72,10 +72,10 @@ public class Elevator extends SubsystemBase {
 
   private static final class constants { // arm setpoints
     private static final double zero = 0.0;
-    private static final double pickUp = 3.0;
+    private static final double pickUp = 0.0;
     private static final double levelOne = 17.0;
-    private static final double levelTwo = 30;
-    private static final double levelThree = 47;
+    private static final double levelTwo = 32.0;
+    private static final double levelThree = 50.0;
     private static final double levelFour = 75;
 
     private static final double elevetorG = 0.125;
