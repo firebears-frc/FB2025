@@ -1,6 +1,6 @@
 package frc.robot.subsystems.elevator;
 
-import static frc.robot.util.SparkUtil.*;
+import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -40,7 +40,12 @@ public class Elevator extends SubsystemBase {
         .smartCurrentLimit(40, 40)
         .secondaryCurrentLimit(50);
 
-    leftSparkMaxConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0.05, 0, 0);
+    leftSparkMaxConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(0.05, 0, 0)
+        .maxOutput(1)
+        .minOutput(-.374);
 
     tryUntilOk(
         leftElevatorMotor,
@@ -68,21 +73,21 @@ public class Elevator extends SubsystemBase {
   private static final class constants { // arm setpoints
     private static final double zero = 0.0;
     private static final double pickUp = 0.0;
-    private static final double levelOne = 15.0;
-    private static final double levelTwo = 30.0;
-    private static final double levelThree = 45.0;
-    private static final double levelFour = 60.0;
+    private static final double levelOne = 17.0;
+    private static final double levelTwo = 32.0;
+    private static final double levelThree = 50.0;
+    private static final double levelFour = 75;
 
     private static final double elevetorG = 0.02;
   }
 
   public void setSetpointRotations(double setpointRotations) {
-    /*  if (setpoint.getDegrees() < -5) {
-      setpoint = Rotation2d.fromDegrees(-5);
-    } else if (setpoint.getDegrees() > 100) {
-      setpoint = Rotation2d.fromDegrees(100);
+    if (setpointRotations < 0) {
+      setpointRotations = 0;
+    } else if (setpointRotations > 75) {
+      setpointRotations = 75;
     }
-    */
+
     this.setpointRotations = setpointRotations;
   }
 

@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Example Path"
+            "pathName": "L4path1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "placel4"
           }
         }
       ]
