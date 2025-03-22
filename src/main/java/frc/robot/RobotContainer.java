@@ -74,13 +74,24 @@ public class RobotContainer {
     // xboxController.b().onTrue(m_ClimbCage.pauseClimbCage());
     xboxController
         .rightTrigger()
-        .onTrue(m_ClimbCage.climbCage())
+        .onTrue(m_ClimbCage.climbCageSlow())
         .onFalse(m_ClimbCage.pauseClimbCage());
     xboxController
         .leftTrigger()
-        .onTrue(m_ClimbCage.reverseClimbCage())
+        .onTrue(m_ClimbCage.reverseClimbCageSlow())
+        .onFalse(m_ClimbCage.pauseClimbCage());
+    xboxController
+        .rightBumper()
+        .onTrue(m_ClimbCage.climbCageFast())
+        .onFalse(m_ClimbCage.pauseClimbCage());
+    xboxController
+        .leftBumper()
+        .onTrue(m_ClimbCage.reverseClimbCageFast())
         .onFalse(m_ClimbCage.pauseClimbCage());
     xboxController.x().onTrue(m_ClimbCage.resetClimber());
+    xboxController.a().onTrue(m_ClimbCage.inClimber());
+    xboxController.b().onTrue(m_ClimbCage.outClimber());
+    xboxController.y().onTrue(m_ClimbCage.pauseClimbCage());
   }
 
   /**

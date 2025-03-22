@@ -18,10 +18,21 @@ import org.littletonrobotics.junction.Logger;
 public class ClimbCage extends SubsystemBase {
   private SparkMax ClimbCageMotor = new SparkMax(8, MotorType.kBrushless);
   private final SparkClosedLoopController ClimbCageController;
+  // Adjust to desired value  -- change
+  private double slowSpeed = 150;
+  private double fastSpeed = 300;
+  private double setPointSpeed = 250;
+  private double resetPosition = .0;
+  private double outPosition = .25;
+  private double inPosition = -.25;
+  // Might need to change upon install
+  private double setPointDirection = -1;
+  // Won't need to change these
   private double setPoint = 0;
   private double armPosition = 0;
+  private boolean climberOut = false;
+  private boolean climberIn = false;
   private boolean climberReset = false;
-  private double resetPosition = 0;
   private static AbsoluteEncoder shoulderEncoder;
 
   private static final int ClimbCageCurrentLimit = 30;
@@ -32,7 +43,7 @@ public class ClimbCage extends SubsystemBase {
     shoulderEncoder = ClimbCageMotor.getAbsoluteEncoder();
     ClimbCageController = ClimbCageMotor.getClosedLoopController();
     var ClimbCageConfig = new SparkMaxConfig();
-    ClimbCageConfig.idleMode(IdleMode.kCoast)
+    ClimbCageConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(ClimbCageCurrentLimit)
         .secondaryCurrentLimit(50)
         .voltageCompensation(12.0);
@@ -71,71 +82,156 @@ public class ClimbCage extends SubsystemBase {
     return getError() < 100 && getError() > -100;
   }
 
-  public Command climbCage() {
-    climberReset = false;
+  // MANUAL COMMANDS
+  public Command climbCageSlow() {
     return runOnce(
         () -> {
-          setPoint = 70;
+          climberReset = false;
+          climberIn = false;
+          climberOut = false;
+          setPoint = slowSpeed * setPointDirection;
         });
   }
 
+  public Command reverseClimbCageSlow() {
+    return runOnce(
+        () -> {
+          climberReset = false;
+          climberIn = false;
+          climberOut = false;
+          setPoint = -slowSpeed * setPointDirection;
+        });
+  }
+
+  public Command climbCageFast() {
+    return runOnce(
+        () -> {
+          climberReset = false;
+          climberIn = false;
+          climberOut = false;
+          setPoint = fastSpeed * setPointDirection;
+        });
+  }
+
+  public Command reverseClimbCageFast() {
+    return runOnce(
+        () -> {
+          climberReset = false;
+          climberIn = false;
+          climberOut = false;
+          setPoint = -fastSpeed * setPointDirection;
+        });
+  }
+
+  public Command pauseClimbCage() {
+    return runOnce(
+        () -> {
+          climberReset = false;
+          climberIn = false;
+          climberOut = false;
+          setPoint = 0;
+        });
+  }
+
+  // SETPOINT COMMANDS
   public Command resetClimber() {
     return runOnce(
         () -> {
           climberReset = true;
+          climberOut = false;
+          climberIn = false;
           if (armPosition >= resetPosition) {
-            setPoint = -50;
+            setPoint = -setPointSpeed * setPointDirection;
             System.out.println("Set Point: " + setPoint);
             System.out.println("Arm Position: " + armPosition);
           } else {
-            setPoint = 50;
+            setPoint = setPointSpeed * setPointDirection;
             System.out.println("Set Point: " + setPoint);
             System.out.println("Arm Position: " + armPosition);
           }
         });
   }
 
-  public Command reverseClimbCage() {
-    climberReset = false;
+  public Command outClimber() {
     return runOnce(
         () -> {
-          setPoint = -100;
+          climberOut = true;
+          climberIn = false;
+          climberReset = false;
+          if (armPosition >= outPosition) {
+            setPoint = -setPointSpeed * setPointDirection;
+            System.out.println("Set Point: " + setPoint);
+            System.out.println("Arm Position: " + armPosition);
+          } else {
+            setPoint = setPointSpeed * setPointDirection;
+            System.out.println("Set Point: " + setPoint);
+            System.out.println("Arm Position: " + armPosition);
+          }
         });
   }
 
-  public Command pauseClimbCage() {
-    climberReset = false;
+  public Command inClimber() {
     return runOnce(
         () -> {
-          setPoint = 0;
+          climberIn = true;
+          climberOut = false;
+          climberReset = false;
+          if (armPosition >= inPosition) {
+            setPoint = -setPointSpeed * setPointDirection;
+            System.out.println("Set Point: " + setPoint);
+            System.out.println("Arm Position: " + armPosition);
+          } else {
+            setPoint = setPointSpeed * setPointDirection;
+            System.out.println("Set Point: " + setPoint);
+            System.out.println("Arm Position: " + armPosition);
+          }
         });
   }
 
   @Override
   public void periodic() {
 
-    armPosition = shoulderEncoder.getPosition();
-    if (armPosition > .50) {
-      armPosition = armPosition - 1;
+    if (shoulderEncoder.getPosition() < .50) {
+      armPosition = shoulderEncoder.getPosition();
     }
+    if (shoulderEncoder.getPosition() > .50) {
+      armPosition = shoulderEncoder.getPosition() - 1;
+    }
+    // setPoint based inequalities may need to be flipped upon install -- change
     if (armPosition >= .25) {
-      if (setPoint > 0) {
+      if (setPoint < 0) {
         setPoint = 0;
       }
     }
     if (armPosition <= -.25) {
-      if (setPoint < 0) {
+      if (setPoint > 0) {
         setPoint = 0;
       }
     }
     System.out.println("Set Point: " + setPoint);
     System.out.println("Arm Position: " + armPosition);
     if (climberReset == true) {
-      if ((armPosition < resetPosition + 0.05) && (armPosition > resetPosition - 0.05)) {
+      if ((armPosition < resetPosition + 0.01) && (armPosition > resetPosition - 0.01)) {
         System.out.println("Set Point: " + setPoint);
         setPoint = 0;
-        System.out.println("Reset turns back to false");
+        System.out.println("climberReset turns back to false");
         climberReset = false;
+      }
+    }
+    if (climberIn == true) {
+      if ((armPosition < inPosition + 0.01) && (armPosition > inPosition - 0.01)) {
+        System.out.println("Set Point: " + setPoint);
+        setPoint = 0;
+        System.out.println("climberIn turns back to false");
+        climberIn = false;
+      }
+    }
+    if (climberOut == true) {
+      if ((armPosition < outPosition + 0.01) && (armPosition > outPosition - 0.01)) {
+        System.out.println("Set Point: " + setPoint);
+        setPoint = 0;
+        System.out.println("climberOut turns back to false");
+        climberOut = false;
       }
     }
 
