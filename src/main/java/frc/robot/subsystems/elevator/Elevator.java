@@ -132,19 +132,19 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command levelOne() {
-    return positionCommand(constants.levelOne, 0.5);
+    return positionCommand(constants.levelOne, 1.0);
   }
 
   public Command levelTwo() {
-    return positionCommand(constants.levelTwo, 0.5);
+    return positionCommand(constants.levelTwo, 1.0);
   }
 
   public Command levelThree() {
-    return positionCommand(constants.levelThree, 0.5);
+    return positionCommand(constants.levelThree, 1.0);
   }
 
   public Command levelFour() {
-    return positionCommand(constants.levelFour, 0.5);
+    return positionCommand(constants.levelFour, 1.0);
   }
 
   public void periodic() {
