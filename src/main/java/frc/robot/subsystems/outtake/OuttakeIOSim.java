@@ -7,6 +7,7 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class OuttakeIOSim implements OuttakeIO {
   private final DCMotor motor = DCMotor.getNEO(1);
@@ -14,6 +15,8 @@ public class OuttakeIOSim implements OuttakeIO {
       LinearSystemId.createFlywheelSystem(motor, 0.004, Outtake.Constants.GEAR_RATIO);
   private final FlywheelSim sim = new FlywheelSim(plant, motor);
   private final PIDController pid = new PIDController(0.0, 0.0, 0.0);
+  private final LoggedNetworkBoolean beamBrakeSim =
+      new LoggedNetworkBoolean("SmartDashboard/Intake/Beam Brake Simulation", false);
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
@@ -33,6 +36,7 @@ public class OuttakeIOSim implements OuttakeIO {
     inputs.velocityRadiansPerSecond = sim.getAngularAccelerationRadPerSecSq();
     inputs.appliedVolts = appliedVolts;
     inputs.appliedCurrent = sim.getCurrentDrawAmps();
+    inputs.beamBrake = beamBrakeSim.get();
   }
 
   @Override

@@ -5,6 +5,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -15,6 +16,7 @@ public class OuttakeIOSparkMax implements OuttakeIO {
   private final SparkMax motor = new SparkMax(12, MotorType.kBrushless);
   private final RelativeEncoder encoder = motor.getEncoder();
   private final SparkClosedLoopController closedLoopController = motor.getClosedLoopController();
+  private final SparkLimitSwitch beamBrake = motor.getForwardLimitSwitch();
   private final SparkMaxConfig config = new SparkMaxConfig();
 
   public OuttakeIOSparkMax() {
@@ -31,6 +33,7 @@ public class OuttakeIOSparkMax implements OuttakeIO {
             encoder.getVelocity() / Outtake.Constants.GEAR_RATIO);
     inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
     inputs.appliedCurrent = motor.getOutputCurrent();
+    inputs.beamBrake = beamBrake.isPressed();
   }
 
   @Override

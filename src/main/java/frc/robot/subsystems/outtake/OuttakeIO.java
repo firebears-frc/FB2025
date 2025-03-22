@@ -9,6 +9,7 @@ public interface OuttakeIO {
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
     public double appliedCurrent = 0.0;
+    public boolean beamBrake = false;
   }
 
   /** Updates the set of loggable inputs. */

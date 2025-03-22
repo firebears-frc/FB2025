@@ -84,6 +84,10 @@ public class Outtake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Outtake", inputs);
 
+    if (inputs.beamBrake) {
+      stopOuttake();
+    }
+
     switch (state) {
       case STOPPED:
         stopOuttake();
