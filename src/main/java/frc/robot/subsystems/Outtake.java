@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.SparkUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,26 +41,14 @@ public class Outtake extends SubsystemBase {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pidf(.00007, 0.0, 0.0, 1.774691358024691e-4);
     // ff: 1.774691358024691e-4
+    outTakeConfig.limitSwitch.forwardLimitSwitchEnabled(false);
 
-    tryUntilOk(
+    SparkUtil.tryUntilOk(
         outtakeMotor,
         5,
         () ->
             outtakeMotor.configure(
                 outTakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-  }
-
-  private void tryUntilOk(SparkMax spark, int retries, Runnable config) {
-    for (int i = 0; i < retries; i++) {
-      try {
-        config.run();
-        break;
-      } catch (Exception e) {
-        if (i == retries - 1) {
-          throw e;
-        }
-      }
-    }
   }
 
   @AutoLogOutput(key = "outtake/beamBreak")
