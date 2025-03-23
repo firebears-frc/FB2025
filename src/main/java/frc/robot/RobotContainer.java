@@ -153,13 +153,16 @@ public class RobotContainer {
     controller.rightStick().onTrue(DriveCommands.resetGyro(drive));
 
     // TODO: Combine with elevator commands
-    controller.a().onTrue(outtake.out()).onFalse(outtake.stop());
-    controller.b().onTrue(outtake.in()).onFalse(outtake.stop());
-    controller.start().onTrue(outtake.eject()).onFalse(outtake.stop());
-    controller.back().onTrue(outtake.reverse()).onFalse(outtake.stop());
+    // controller.a().onTrue(outtake.out()).onFalse(outtake.stop());
+    // controller.b().onTrue(outtake.in()).onFalse(outtake.stop());
+    // controller.start().onTrue(outtake.eject()).onFalse(outtake.stop());
+    // controller.back().onTrue(outtake.reverse()).onFalse(outtake.stop());
 
     // Extend climber on press of left bumper, climb on release
     controller.leftBumper().onTrue(climber.grab()).onFalse(climber.climb());
+
+    // Stow climber on press of start
+    controller.start().onTrue(climber.stow());
   }
 
   /**

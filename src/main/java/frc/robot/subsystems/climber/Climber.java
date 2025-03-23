@@ -29,10 +29,10 @@ public class Climber extends SubsystemBase {
     SYSID
   }
 
-  private final LoggedNetworkNumber stowInput = new LoggedNetworkNumber("Climber/Stow Angle", 0.0);
-  private final LoggedNetworkNumber grabInput = new LoggedNetworkNumber("Climber/Grab Angle", 90.0);
+  private final LoggedNetworkNumber stowInput = new LoggedNetworkNumber("Climber/Stow Angle", 90.0);
+  private final LoggedNetworkNumber grabInput = new LoggedNetworkNumber("Climber/Grab Angle", 0.0);
   private final LoggedNetworkNumber climbInput =
-      new LoggedNetworkNumber("Climber/Climb Angle", -15.0);
+      new LoggedNetworkNumber("Climber/Climb Angle", 120.0);
 
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();

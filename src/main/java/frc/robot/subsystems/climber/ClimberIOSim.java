@@ -12,7 +12,7 @@ public class ClimberIOSim implements ClimberIO {
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
           Climber.Constants.GEAR_RATIO,
-          Units.lbsToKilograms(10.0) * Math.pow(Units.inchesToMeters(9.0), 2),
+          Units.lbsToKilograms(120.0) * Math.pow(Units.inchesToMeters(9.0), 2),
           Units.inchesToMeters(12.0),
           Climber.Constants.MINIMUM.getRadians(),
           Climber.Constants.MAXIMUM.getRadians(),
