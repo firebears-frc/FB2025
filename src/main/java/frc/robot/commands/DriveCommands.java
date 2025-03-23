@@ -295,4 +295,15 @@ public class DriveCommands {
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
   }
+
+  public static Command x(Drive drive) {
+    return Commands.startEnd(drive::stopWithX, drive::stop, drive);
+  }
+
+  public static Command resetGyro(Drive drive) {
+    return Commands.runOnce(
+            () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+            drive)
+        .ignoringDisable(true);
+  }
 }
