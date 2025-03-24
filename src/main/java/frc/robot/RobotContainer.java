@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.OuttakeCommands;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOSim;
@@ -153,10 +154,22 @@ public class RobotContainer {
     controller.rightStick().onTrue(DriveCommands.resetGyro(drive));
 
     // TODO: Combine with elevator commands
-    // controller.a().onTrue(outtake.out()).onFalse(outtake.stop());
-    // controller.b().onTrue(outtake.in()).onFalse(outtake.stop());
-    // controller.start().onTrue(outtake.eject()).onFalse(outtake.stop());
-    // controller.back().onTrue(outtake.reverse()).onFalse(outtake.stop());
+    controller
+        .a()
+        .onTrue(OuttakeCommands.speed(outtake, OuttakeCommands.Speed.OUT))
+        .onFalse(OuttakeCommands.stop(outtake));
+    controller
+        .b()
+        .onTrue(OuttakeCommands.speed(outtake, OuttakeCommands.Speed.IN))
+        .onFalse(OuttakeCommands.stop(outtake));
+    controller
+        .start()
+        .onTrue(OuttakeCommands.speed(outtake, OuttakeCommands.Speed.EJECT))
+        .onFalse(OuttakeCommands.stop(outtake));
+    controller
+        .back()
+        .onTrue(OuttakeCommands.speed(outtake, OuttakeCommands.Speed.REVERSE))
+        .onFalse(OuttakeCommands.stop(outtake));
 
     // Extend climber on press of left bumper, climb on release
     controller.leftBumper().onTrue(climber.grab()).onFalse(climber.climb());
