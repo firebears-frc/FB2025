@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.ClimberCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.OuttakeCommands;
 import frc.robot.subsystems.climber.Climber;
@@ -172,10 +173,13 @@ public class RobotContainer {
         .onFalse(OuttakeCommands.stop(outtake));
 
     // Extend climber on press of left bumper, climb on release
-    controller.leftBumper().onTrue(climber.grab()).onFalse(climber.climb());
+    controller
+        .leftBumper()
+        .onTrue(ClimberCommands.angle(climber, ClimberCommands.Angle.GRAB))
+        .onFalse(ClimberCommands.angle(climber, ClimberCommands.Angle.CLIMB));
 
     // Stow climber on press of start
-    controller.start().onTrue(climber.stow());
+    controller.start().onTrue(ClimberCommands.angle(climber, ClimberCommands.Angle.STOW));
   }
 
   /**
