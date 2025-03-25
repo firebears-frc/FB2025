@@ -60,38 +60,40 @@ public class RobotContainer {
   private void configureAutoCommands() {
     NamedCommands.registerCommands(
         Map.of(
+            "pickUp",
+            m_outtake.autoIntake(7),
             "placeL1",
-                Commands.sequence(
-                    m_elevator.levelOne(),
-                    Commands.waitSeconds(1),
-                    m_outtake.placeCoral(),
-                    Commands.waitSeconds(1),
-                    m_outtake.pauseOutTake(),
-                    m_elevator.pickUp()),
+            Commands.sequence(
+                m_elevator.levelOne(),
+                Commands.waitSeconds(1),
+                m_outtake.placeCoral(),
+                Commands.waitSeconds(1),
+                m_outtake.pauseOutTake(),
+                m_elevator.pickUp()),
             "placeL2",
-                Commands.sequence(
-                    m_elevator.levelTwo(),
-                    Commands.waitSeconds(1),
-                    m_outtake.placeCoral(),
-                    Commands.waitSeconds(1),
-                    m_outtake.pauseOutTake(),
-                    m_elevator.pickUp()),
+            Commands.sequence(
+                m_elevator.levelTwo(),
+                Commands.waitSeconds(1),
+                m_outtake.placeCoral(),
+                Commands.waitSeconds(1),
+                m_outtake.pauseOutTake(),
+                m_elevator.pickUp()),
             "placeL3",
-                Commands.sequence(
-                    m_elevator.levelThree(),
-                    Commands.waitSeconds(1),
-                    m_outtake.placeCoral(),
-                    Commands.waitSeconds(1),
-                    m_outtake.pauseOutTake(),
-                    m_elevator.pickUp()),
+            Commands.sequence(
+                m_elevator.levelThree(),
+                Commands.waitSeconds(1),
+                m_outtake.placeCoral(),
+                Commands.waitSeconds(1),
+                m_outtake.pauseOutTake(),
+                m_elevator.pickUp()),
             "placeL4",
-                Commands.sequence(
-                    m_elevator.levelFour(),
-                    Commands.waitSeconds(1),
-                    m_outtake.placeCoral(),
-                    Commands.waitSeconds(1),
-                    m_outtake.pauseOutTake(),
-                    m_elevator.pickUp())));
+            Commands.sequence(
+                m_elevator.levelFour(),
+                Commands.waitSeconds(1),
+                m_outtake.placeCoral(),
+                Commands.waitSeconds(1),
+                m_outtake.pauseOutTake(),
+                m_elevator.pickUp())));
   }
 
   // Dashboard inputs
