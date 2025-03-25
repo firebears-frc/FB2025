@@ -11,6 +11,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -103,6 +104,11 @@ public class Outtake extends SubsystemBase {
         () -> {
           setPoint = 0;
         });
+  }
+
+  public Command autoIntake(double timeOut) {
+    return Commands.sequence(
+        runOnce(() -> setPoint = 7000), run(() -> {}).until(() -> hasCoral).withTimeout(timeOut));
   }
 
   @Override

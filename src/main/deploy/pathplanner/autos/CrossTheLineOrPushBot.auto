@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "One Coral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "placeL1"
+            "pathName": "CrossTheLinePath1"
           }
         }
       ]
