@@ -92,7 +92,7 @@ public class RobotContainer {
             Commands.sequence(
                 m_elevator.levelFour(),
                 Commands.waitSeconds(1),
-                m_outtake.placeCoral(),
+                m_outtake.slowPlaceCoral(),
                 Commands.waitSeconds(1),
                 m_outtake.pauseOutTake(),
                 m_elevator.pickUp())));
