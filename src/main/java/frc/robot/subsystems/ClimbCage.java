@@ -19,8 +19,8 @@ public class ClimbCage extends SubsystemBase {
   private SparkMax ClimbCageMotor = new SparkMax(13, MotorType.kBrushless);
   private final SparkClosedLoopController ClimbCageController;
   // Adjust to desired value  -- change
-  private double slowSpeed = 150;
-  private double fastSpeed = 300;
+  private double slowSpeed = 600;
+  private double fastSpeed = 6000;
   private double setPointSpeed = 250;
   private double resetPosition = .0;
   private double outPosition = .25;
@@ -45,7 +45,7 @@ public class ClimbCage extends SubsystemBase {
 
   private static AbsoluteEncoder shoulderEncoder;
 
-  private static final int ClimbCageCurrentLimit = 30;
+  private static final int ClimbCageCurrentLimit = 50;
 
   public ClimbCage() {
 
@@ -55,11 +55,11 @@ public class ClimbCage extends SubsystemBase {
     var ClimbCageConfig = new SparkMaxConfig();
     ClimbCageConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(ClimbCageCurrentLimit)
-        .secondaryCurrentLimit(50)
+        .secondaryCurrentLimit(60)
         .voltageCompensation(12.0);
     ClimbCageConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(.0001, 0.0, 0.0, 1.774691358024691e-4);
+        .pidf(.001, 0.0, 0.0, 1.774691358024691e-4);
 
     tryUntilOk(
         ClimbCageMotor,
@@ -201,7 +201,7 @@ public class ClimbCage extends SubsystemBase {
         setPoint = 0;
       }
     }
-    if (armPosition <= -.25) {
+    if (armPosition <= -.164) {
       if (setPoint > 0) {
         setPoint = 0;
       }
