@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.ClimbCage;
 import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -50,6 +51,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator m_elevator = new Elevator();
   private final Outtake m_outtake = new Outtake();
+  private final ClimbCage m_ClimbCage = new ClimbCage();
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
@@ -200,6 +202,24 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    xboxController
+        .rightTrigger()
+        .onTrue(m_ClimbCage.climbCageSlow())
+        .onFalse(m_ClimbCage.pauseClimbCage());
+    xboxController
+        .leftTrigger()
+        .onTrue(m_ClimbCage.reverseClimbCageSlow())
+        .onFalse(m_ClimbCage.pauseClimbCage());
+    xboxController
+        .rightBumper()
+        .onTrue(m_ClimbCage.climbCageFast())
+        .onFalse(m_ClimbCage.pauseClimbCage());
+    xboxController
+        .leftBumper()
+        .onTrue(m_ClimbCage.reverseClimbCageFast())
+        .onFalse(m_ClimbCage.pauseClimbCage());
+
     xboxController.povUp().onTrue(m_elevator.levelFour());
     xboxController.povDown().onTrue(m_elevator.zero());
     xboxController.povRight().onTrue(m_elevator.levelTwo());
@@ -208,12 +228,6 @@ public class RobotContainer {
     xboxController.y().onTrue(m_outtake.slowPlaceCoral()).onFalse(m_outtake.pauseOutTake());
     xboxController.b().onTrue(m_outtake.reverseOutTake()).onFalse(m_outtake.pauseOutTake());
     xboxController.x().onTrue(m_outtake.placeCoral()).onFalse(m_outtake.pauseOutTake());
-
-    /*xboxController.leftTrigger().onTrue(m_elevator.levelTwo());
-    xboxController.leftTrigger().onTrue(m_elevator.levelThree());
-    xboxController.rightBumper().onTrue(m_elevator.levelOne());
-    xboxController.leftBumper().onTrue(m_elevator.levelFour());
-    */
     m_elevator.setDefaultCommand(
         m_elevator.defaultCommand(() -> MathUtil.applyDeadband(xboxController.getLeftY(), 0.2)));
   }
