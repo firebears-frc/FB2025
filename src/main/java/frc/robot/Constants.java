@@ -45,15 +45,28 @@ public final class Constants {
   }
   // 11z 7x 19.5y
   public static final class VisionConstants {
-    public static final String kCameraName = "Arducam_OV2311_USB_Camera";
-    public static final Transform3d kCameraOffset =
+    public static final String kCamera1Name = "CAM1"; // left
+    public static final Transform3d kCamera1Offset =
         new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(-11.5), Units.inchesToMeters(0), Units.inchesToMeters(13.00)),
+                Units.inchesToMeters(-11.625),
+                Units.inchesToMeters(-6.75),
+                Units.inchesToMeters(22)),
             new Rotation3d(
                 Rotation2d.fromDegrees(180).getRadians(),
-                Rotation2d.fromDegrees(-30.0).getRadians(),
-                Rotation2d.fromDegrees(180).getRadians()));
+                Rotation2d.fromDegrees(0.0).getRadians(),
+                Rotation2d.fromDegrees(-30).getRadians()));
+    public static final String kCamera2Name = "CAM2"; // right
+    public static final Transform3d kCamera2Offset =
+        new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(-11.625),
+                Units.inchesToMeters(6.75),
+                Units.inchesToMeters(22)),
+            new Rotation3d(
+                Rotation2d.fromDegrees(180.0).getRadians(),
+                Rotation2d.fromDegrees(0.0).getRadians(),
+                Rotation2d.fromDegrees(150.0).getRadians()));
     public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS =
         VecBuilder.fill(1.50, 1.50, 2 * Math.PI);
     public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.30, 0.30, Math.PI);
