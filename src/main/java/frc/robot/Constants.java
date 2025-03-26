@@ -49,11 +49,11 @@ public final class Constants {
     public static final Transform3d kCameraOffset =
         new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(-11.5), Units.inchesToMeters(0), Units.inchesToMeters(13.00)),
+                Units.inchesToMeters(-11.625), Units.inchesToMeters(-6.75), Units.inchesToMeters(22)),
             new Rotation3d(
                 Rotation2d.fromDegrees(180).getRadians(),
                 Rotation2d.fromDegrees(-30.0).getRadians(),
-                Rotation2d.fromDegrees(180).getRadians()));
+                Rotation2d.fromDegrees(-30).getRadians()));
     public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS =
         VecBuilder.fill(1.50, 1.50, 2 * Math.PI);
     public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.30, 0.30, Math.PI);
