@@ -215,10 +215,6 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(m_ClimbCage.climbCageFast())
         .onFalse(m_ClimbCage.pauseClimbCage());
-    xboxController
-        .leftBumper()
-        .onTrue(m_ClimbCage.reverseClimbCageFast())
-        .onFalse(m_ClimbCage.pauseClimbCage());
 
     xboxController.povUp().onTrue(m_elevator.levelFour());
     xboxController.povDown().onTrue(m_elevator.zero());
