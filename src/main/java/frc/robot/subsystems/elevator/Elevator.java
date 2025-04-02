@@ -84,8 +84,8 @@ public class Elevator extends SubsystemBase {
   public void setSetpointRotations(double setpointRotations) {
     if (setpointRotations < 0) {
       setpointRotations = 0;
-    } else if (setpointRotations > 72) {
-      setpointRotations = 72;
+    } else if (setpointRotations > 74) {
+      setpointRotations = 74;
     }
 
     this.setpointRotations = setpointRotations;

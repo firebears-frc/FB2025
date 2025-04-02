@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-
 public class ClimbCage extends SubsystemBase {
   private SparkMax ClimbCageMotor = new SparkMax(13, MotorType.kBrushless);
   private final SparkClosedLoopController ClimbCageController;
@@ -29,7 +27,8 @@ public class ClimbCage extends SubsystemBase {
   private double resetPosition = .0;
   private double outPosition = .25;
   private double inPosition = -.25;
-  // Adjust cable values -- change; NEEDS TO BE TRIED OUT TO FIND PROPER VALUES. THESE ARE STARTING POINT, might need to be made negative
+  // Adjust cable values -- change; NEEDS TO BE TRIED OUT TO FIND PROPER VALUES. THESE ARE STARTING
+  // POINT, might need to be made negative
   private double slowCable = 0.2;
   private double fastCable = 1;
   // Might need to change upon install
@@ -41,15 +40,13 @@ public class ClimbCage extends SubsystemBase {
   private boolean climberOut = false;
   private boolean climberIn = false;
   private boolean climberReset = false;
+  private boolean autoCable = true;
   private static AbsoluteEncoder shoulderEncoder;
-
 
   private static final int ClimbCageCurrentLimit = 50;
   private static final int CableCurrentLimit = 50;
 
-
   public ClimbCage() {
-
 
     // Configure turn motor
     shoulderEncoder = ClimbCageMotor.getAbsoluteEncoder();
@@ -61,8 +58,7 @@ public class ClimbCage extends SubsystemBase {
         .voltageCompensation(12.0);
     ClimbCageConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(.001, 0.0, 0.0, 1.774691358024691e-4);
-
+        .pidf(.0001, 0.0, 0.0, 1.774691358024691e-4);
 
     tryUntilOk(
         ClimbCageMotor,
@@ -71,10 +67,7 @@ public class ClimbCage extends SubsystemBase {
             ClimbCageMotor.configure(
                 ClimbCageConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-
-
-
-    CableController = ClimbCageMotor.getClosedLoopController();
+    CableController = CableMotor.getClosedLoopController();
     var CableConfig = new SparkMaxConfig();
     CableConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(CableCurrentLimit)
@@ -84,7 +77,6 @@ public class ClimbCage extends SubsystemBase {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pidf(.0001, 0.0, 0.0, 1.774691358024691e-4);
 
-
     tryUntilOk(
         CableMotor,
         5,
@@ -92,7 +84,6 @@ public class ClimbCage extends SubsystemBase {
             CableMotor.configure(
                 CableConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
-
 
   private void tryUntilOk(SparkMax spark, int retries, Runnable config) {
     for (int i = 0; i < retries; i++) {
@@ -107,18 +98,15 @@ public class ClimbCage extends SubsystemBase {
     }
   }
 
-
   @AutoLogOutput(key = "ClimbCage/error")
   private double getError() {
     return setPoint - ClimbCageMotor.getEncoder().getVelocity();
   }
 
-
   @AutoLogOutput(key = "ClimbCage/atSpeed")
   private boolean atSpeed() {
     return getError() < 100 && getError() > -100;
   }
-
 
   // MANUAL COMMANDS
   public Command climbCageSlow() {
@@ -127,10 +115,10 @@ public class ClimbCage extends SubsystemBase {
           climberReset = false;
           climberIn = false;
           climberOut = false;
+          autoCable = true;
           setPoint = slowSpeed * setPointDirection;
         });
   }
-
 
   public Command reverseClimbCageSlow() {
     return runOnce(
@@ -138,12 +126,12 @@ public class ClimbCage extends SubsystemBase {
           climberReset = false;
           climberIn = false;
           climberOut = false;
+          autoCable = true;
           setPoint = -slowSpeed * setPointDirection;
         });
   }
 
-
-  public Command climbCageFast() {
+  /*public Command climbCageFast() {
     return runOnce(
         () -> {
           climberReset = false;
@@ -151,19 +139,50 @@ public class ClimbCage extends SubsystemBase {
           climberOut = false;
           setPoint = fastSpeed * setPointDirection;
         });
-  }
+  }*/
 
+  /*public Command CabbleBoost() {
+    return runOnce(
+        () -> {
+          if (setPoint == fastSpeed) {
+            cablePower = fastCable;
+          } else if (setPoint == slowSpeed) {
+            cablePower = slowCable;
+          } else if (setPoint == -slowSpeed) {
+            cablePower = -slowCable;
+          } else if (setPoint == 0) {
+            cablePower = 0;
+          }
+        });
+  }*/
 
-  /*public Command reverseClimbCageFast() {
+  public Command reverseClimbCageFast() {
     return runOnce(
         () -> {
           climberReset = false;
           climberIn = false;
           climberOut = false;
-          setPoint = -fastSpeed * setPointDirection;
+          autoCable = false;
+          cablePower = fastCable;
         });
-  }*/
+  }
 
+  public Command pauseCable() {
+    return runOnce(
+        () -> {
+          cablePower = 0;
+        });
+  }
+
+  public Command mediumClimbCage() {
+    return runOnce(
+        () -> {
+          climberReset = false;
+          climberIn = false;
+          climberOut = false;
+          setPoint = 1000 * setPointDirection;
+        });
+  }
 
   public Command pauseClimbCage() {
     return runOnce(
@@ -174,7 +193,6 @@ public class ClimbCage extends SubsystemBase {
           setPoint = 0;
         });
   }
-
 
   // SETPOINT COMMANDS
   public Command resetClimber() {
@@ -195,7 +213,6 @@ public class ClimbCage extends SubsystemBase {
         });
   }
 
-
   public Command outClimber() {
     return runOnce(
         () -> {
@@ -213,7 +230,6 @@ public class ClimbCage extends SubsystemBase {
           }
         });
   }
-
 
   public Command inClimber() {
     return runOnce(
@@ -233,10 +249,8 @@ public class ClimbCage extends SubsystemBase {
         });
   }
 
-
   @Override
   public void periodic() {
-
 
     if (shoulderEncoder.getPosition() < .50) {
       armPosition = shoulderEncoder.getPosition();
@@ -255,46 +269,47 @@ public class ClimbCage extends SubsystemBase {
         setPoint = 0;
       }
     }
-    System.out.println("Set Point: " + setPoint);
-    System.out.println("Arm Position: " + armPosition);
+    // System.out.println("Set Point: " + setPoint);
+    // System.out.println("Arm Position: " + armPosition);
     if (climberReset == true) {
       if ((armPosition < resetPosition + 0.01) && (armPosition > resetPosition - 0.01)) {
-        System.out.println("Set Point: " + setPoint);
+        // System.out.println("Set Point: " + setPoint);
         setPoint = 0;
-        System.out.println("climberReset turns back to false");
+        // System.out.println("climberReset turns back to false");
         climberReset = false;
       }
     }
     if (climberIn == true) {
       if ((armPosition < inPosition + 0.01) && (armPosition > inPosition - 0.01)) {
-        System.out.println("Set Point: " + setPoint);
+        // System.out.println("Set Point: " + setPoint);
         setPoint = 0;
-        System.out.println("climberIn turns back to false");
+        // System.out.println("climberIn turns back to false");
         climberIn = false;
       }
     }
     if (climberOut == true) {
       if ((armPosition < outPosition + 0.01) && (armPosition > outPosition - 0.01)) {
-        System.out.println("Set Point: " + setPoint);
+        // System.out.println("Set Point: " + setPoint);
         setPoint = 0;
-        System.out.println("climberOut turns back to false");
+        // System.out.println("climberOut turns back to false");
         climberOut = false;
       }
     }
-    if(setPoint == fastSpeed){
-      cablePower = fastCable;
-    }else if(setPoint == slowSpeed){
-      cablePower = slowCable;
-    }else if(setPoint == -slowSpeed){
-      cablePower = -slowCable;
-    }else if(setPoint == 0){
-      cablePower = 0;
+    if (autoCable) {
+      if (setPoint == fastSpeed) {
+        cablePower = fastCable;
+      } else if (setPoint == slowSpeed) {
+        cablePower = slowCable;
+      } else if (setPoint == -slowSpeed) {
+        cablePower = -slowCable;
+      } else if (setPoint == 0) {
+        cablePower = 0;
+      } else if (setPoint == -fastSpeed) {
+        cablePower = -fastCable;
+      }
     }
-
-
     ClimbCageController.setReference(setPoint, ControlType.kVelocity);
     CableController.setReference(cablePower, ControlType.kDutyCycle);
-
 
     Logger.recordOutput("ClimbCage/Output", ClimbCageMotor.getAppliedOutput());
     Logger.recordOutput("ClimbCage/speed", ClimbCageMotor.getEncoder().getVelocity());
@@ -302,5 +317,3 @@ public class ClimbCage extends SubsystemBase {
     Logger.recordOutput("ClimbCage/reset", climberReset);
   }
 }
-
-

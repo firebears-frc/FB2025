@@ -70,7 +70,7 @@ public class Outtake extends SubsystemBase {
   public Command reverseOutTake() {
     return runOnce(
         () -> {
-          setPoint = 5000;
+          setPoint = 1000;
         });
   }
 
