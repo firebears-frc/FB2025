@@ -20,6 +20,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.ClimbCage;
 import frc.robot.subsystems.Outtake;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOCanandgyro;
@@ -37,6 +39,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+
+import java.io.IOException;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -52,12 +56,16 @@ public class RobotContainer {
   private final Elevator m_elevator = new Elevator();
   private final Outtake m_outtake = new Outtake();
   private final ClimbCage m_ClimbCage = new ClimbCage();
+  private Vision vision1;
+  private Vision vision2;
   // Controller
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
   private final CommandXboxController xboxController = new CommandXboxController(2);
   // Sensors
   private final UsbCamera driveCamera;
+
+  
 
   private void configureAutoCommands() {
     NamedCommands.registerCommands(
@@ -157,6 +165,17 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    try {
+            vision1 = new Vision(drive::addVisionMeasurement,Constants.VisionConstants.kCamera1Offset, Constants.VisionConstants.kCamera1Name);
+            vision2 = new Vision(drive::addVisionMeasurement,Constants.VisionConstants.kCamera2Offset, Constants.VisionConstants.kCamera2Name);
+        }
+        catch(IOException e){
+            DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
+        }
+
+
+
 
     // Configure the button bindings
     driveCamera = CameraServer.startAutomaticCapture();
